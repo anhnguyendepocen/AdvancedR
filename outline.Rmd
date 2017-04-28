@@ -1,0 +1,205 @@
+---
+title: "Advanced R Outline of Topics"
+author: "JJ Allaire, Jan Vitek, Kylie Bemis, & Tsung-Heng Tsung"
+date: "4/27/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Wednesday, May 3 #
+
+#### 1:30PM - 3:00PM Keynote (JJ Allaire)
+
+#### 3:00PM - 3:30PM Break
+
+#### 3:30PM - 4:00PM Case study (Tsung-Heng Tsai) ####
+
+- Introduce a mass spectrometry dataset as a case study
+- Typical operations for the case study with base R
+- Data wrangling
+    + Data manipulation (filtering, subsetting, etc.)
+    + Data transformation
+    + Summarization
+- Grouped summary
+    + `for` loops
+    + `tapply`
+    + `aggregate`
+    + How these fit into the analysis workflow?
+- Statistical modeling and testing
+    + Utility functions
+    + Issues to be resolved
+
+#### 4:00PM - 5:00PM Introduction/overview of R (Jan Vitek) ####
+
+- TODO
+
+#### 5:00PM - 6:00PM R Markdown and Github (Sara Taheri) ####
+
+- TODO
+
+#### 6:00PM Adjourn ####
+
+# Thursday, May 4 #
+
+#### 8:00AM - 9:00AM Bring your own data
+
+#### 9:00AM - 10:30AM tidyverse : data wrangling pt. 1 (Tsung-Heng Tsai) ####
+
+- Introduction to tidy data
+    + What is tidy data?
+    + Why tidy data?
+    + Examples of non-tidy (messy) datasets
+- Tidying messy data with tidyr
+- Data manipulation and transformation with dplyr
+    + Manipulation and transformation on one dataset
+    + Make grouped summaries with summary functions
+    + Merge datasets
+- Grouped summaries with arbitrary operations
+    + List-column
+    
+#### 10:30AM - 11:00AM Break
+
+#### 11:00AM - 12:30PM tidyverse : data wrangling pt. 2 (Tsung-Heng Tsai) ####
+
+- TODO
+
+#### 12:30PM - 1:30PM Lunch
+
+#### 1:30PM - 3:00PM tidyverse : modeling (Tsung-Heng Tsai) ####
+
+- Example: using a for loop to make grouped summaries
+    + Loop over proteins
+    + Fit a linear model
+    + Extract information from model object and combine the results
+- Methods for better solution 
+    + Tidying methods for model objects
+    + List-columns
+- General workflow with nested data frames
+    + `nest`
+    + `map`
+    + `unnest`
+    
+#### 3:00PM - 3:30PM Break
+
+#### 3:30PM - 4:15PM Functions (Jan Vitek) ####
+
+- Basics: what is a function and why would you write one?
+- How to write a function
+- Parts of a function
+    + Formals
+    + Body
+    + Environment
+- Example: writing a function
+    + Rewrite a previous example (from case study?) as a function
+- Function arguments
+    + Default and missing arguments
+    + Lazy evaluation
+- Returning values: implicit, `return()`, `invisible()`
+- John Chambers: "To understand computations in R, two slogans are helpful:"
+    + *Everything that exists is an object*
+    + *Everything that happens is a function call*
+- Example: `+` and `-`, etc., are also functions, can be redefined
+- Infix functions, creating a user-defined `%plus%`, etc.
+- How to write good functions
+
+#### 4:15PM - 5:00PM Functional programming (Jan Vitek) ####
+
+- Motivation, showing problem w/ repetitive copy-paste solution (what problem?)
+- Functionals: `lapply` and family
+- Example: better solution to problem using `lapply`
+- More examples:
+    + `sapply`
+    + `tapply`
+    + `vapply`
+    + `apply`
+    + etc.
+- Anonymous functions
+- Closures
+- When to use a loop vs. functional
+
+#### 5:00PM - 6:00PM Extra Practice ####
+
+#### 6:00PM Adjourn ####
+
+# Friday, May 5 #
+
+#### 8:00AM - 9:00AM Bring your own data
+
+#### 9:00AM - 10:30AM Object-oriented Programming (Kylie Bemis) ####
+
+- What is object-oriented programming (OOP)?
+- When to use OOP?
+- OOP in R: S3 vs. S4
+- Introduction to S3
+- Example: S3
+    + Rewrite a previous example using S3 objects and methods
+- Introduction to S4
+- Example: S4
+    + Rewrite a previous example using S4 objects and methods
+- When to use S3 vs. S4?
+- Other alternatives (ReferenceClasses, R6, etc.)
+
+#### 10:30AM - 11:00AM Break
+
+#### 11:00AM - 12:30PM Building an R package (Kylie Bemis) ####
+
+- Why and when to build a package?
+- Directory layout of a package
+    + DESCRIPTION
+    + NAMESPACE
+    + /R
+    + /src
+    + /vignettes
+    + etc.
+- How to build a package (easily)
+- Useful tools
+    + Roxygen
+    + devtools
+    + etc.
+- Unit tests
+    + RUnit
+    + testthat
+- How to submit packages to Bioconductor/CRAN
+
+#### 12:30PM - 1:30PM Lunch
+
+#### 1:30PM - 3:00PM Performance, profiling, debugging (Kylie Bemis) ####
+
+- Tools for CPU performance:
+    + Rprof
+    + microbenchmark
+    + etc.
+- Tools for memory performance:
+    + Rprofmem
+    + pryr (refs)
+    + etc.
+    + How to avoid copying
+- Debugging
+    + browser()
+    + debug()
+    + options(error=recover)
+    + Rstudio integration
+    
+#### 3:00PM - 3:30PM Break
+
+#### 3:30PM - 5:00PM Scalability (Kylie Bemis) ####
+
+- CPU scalability in R (single machine) w/ examples
+    + parallel package (SNOW, multicore)
+    + foreach + registered backend
+- Memory scalability in R  (single machine) w/ examples
+    + bigmemory
+    + ff
+    + matter
+    + HDF5, NetCDF, etc.
+- Scalability on multiple machines (no examples)
+    + rhipe, hadoop, etc.
+- Scaling using C/C++
+    + Writing C/C++ with R internals
+    + Writing C/C++ with Rcpp
+
+#### 5:00PM - 6:00PM Wrap-up & Jeopardy ####
+
+#### 6:00PM Adjourn ####
