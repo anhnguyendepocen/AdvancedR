@@ -1,0 +1,40 @@
+---
+title: "A Tour of Advanced R"
+author: "Advanced R"
+date: "Wednesday May 3, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Where from R?
+
+The R programming language has its roots in the S language developped over forty years ago at ATT Bell Labs by John Chambers, Rick Becker and Allan Wilks.
+
+The original impetus was to develop a glue language for library calls.  The statisticians at Bell labs had a rich set of libraries written in Fortran. But to call any of these libraries, one had to write Fortran code to read the data, then arrange the data in the layout expected by the library, the call the function and write code that would write the results out.
+
+The goal of S was to hide all that and speed up the task of exploratory data analysis.
+
+Another goal os S was to be an extensible language devoid of the arbitrary limitations that were enforced on Fortran programs.
+
+Over the years the language grew and its implementations improved in performance so much that it became possible to write statical anylsis code in S itself.
+
+The R programming language was designed by Ross Ihaka and Robert Gentleman at the University of Auckland around 1992.  R departed from S in number of ways, it was a resolutely open source language, it cleaned up some mistakes in the R design (such as lexical scoping which it took from Scheme), and improved execution performance.
+
+
+* Data structures
+* Subsetting
+* Functions
+* Lazy evaluation
+* Environments
+* Objects
+* Domain specific languages
+
+* Execution model:  names and bindings, environments
+
+* Exceptions
+* Namespaces
+
+* Vectorization
