@@ -54,17 +54,20 @@ knitr::opts_chunk$set(echo = TRUE)
 - Tidying messy data with tidyr
 - Data manipulation and transformation with dplyr
     + Manipulation and transformation on one dataset
-    + Make grouped summaries with summary functions
-    + Merge datasets
-- Grouped summaries with arbitrary operations
-    + List-column
-    
+
 #### 10:30AM - 11:00AM Break
 
 #### 11:00AM - 12:30PM tidyverse : data wrangling pt. 2 (Tsung-Heng Tsai) ####
 
-- TODO
-
+- Data manipulation and transformation with dplyr (cont.)
+    + Make grouped summaries with summary functions
+    + Merge datasets
+- Two tasks for the case study
+    + Normalization by equalizing medians across runs
+    + Summarization of feature intensities
+- Grouped summaries with arbitrary operations
+    + List-column
+    
 #### 12:30PM - 1:30PM Lunch
 
 #### 1:30PM - 3:00PM tidyverse : modeling (Tsung-Heng Tsai) ####
