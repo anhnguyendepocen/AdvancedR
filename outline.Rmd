@@ -31,11 +31,11 @@ knitr::opts_chunk$set(echo = TRUE)
     + Utility functions
     + Issues to be resolved
 
-#### 4:00PM - 5:00PM Introduction/overview of R (Jan Vitek) ####
+#### Session 1 4:00PM - 5:00PM Introduction/overview of R (Jan Vitek) ####
 
 - TODO
 
-#### 5:00PM - 6:00PM R Markdown and Github (Sara Taheri) ####
+#### Session 2 5:00PM - 6:00PM R Markdown and Github (Sara Taheri) ####
 
 - TODO
 
@@ -45,7 +45,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #### 8:00AM - 9:00AM Bring your own data
 
-#### 9:00AM - 10:30AM tidyverse : data wrangling pt. 1 (Tsung-Heng Tsai) ####
+#### Session 3 9:00AM - 10:30AM tidyverse : data wrangling pt. 1 (Tsung-Heng Tsai) ####
 
 - Introduction to tidy data
     + What is tidy data?
@@ -70,7 +70,7 @@ knitr::opts_chunk$set(echo = TRUE)
     
 #### 12:30PM - 1:30PM Lunch
 
-#### 1:30PM - 3:00PM tidyverse : modeling (Tsung-Heng Tsai) ####
+#### Session 5 1:30PM - 3:00PM tidyverse : modeling (Tsung-Heng Tsai) ####
 
 - Example: using a for loop to make grouped summaries
     + Loop over proteins
@@ -86,7 +86,7 @@ knitr::opts_chunk$set(echo = TRUE)
     
 #### 3:00PM - 3:30PM Break
 
-#### 3:30PM - 4:15PM Functions (Jan Vitek) ####
+#### Session 6 3:30PM - 4:15PM Functions (Jan Vitek) ####
 
 - Basics: what is a function and why would you write one?
 - How to write a function
@@ -107,7 +107,7 @@ knitr::opts_chunk$set(echo = TRUE)
 - Infix functions, creating a user-defined `%plus%`, etc.
 - How to write good functions
 
-#### 4:15PM - 5:00PM Functional programming (Jan Vitek) ####
+#### Session 7 4:15PM - 5:00PM Functional programming (Jan Vitek) ####
 
 - Motivation, showing problem w/ repetitive copy-paste solution (what problem?)
 - Functionals: `lapply` and family
@@ -130,7 +130,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #### 8:00AM - 9:00AM Bring your own data
 
-#### 9:00AM - 10:30AM Object-oriented Programming (Kylie Bemis) ####
+#### Session 8 9:00AM - 10:30AM Object-oriented Programming (Kylie Bemis) ####
 
 - What is object-oriented programming (OOP)?
 - When to use OOP?
@@ -146,7 +146,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #### 10:30AM - 11:00AM Break
 
-#### 11:00AM - 12:30PM Building an R package (Kylie Bemis) ####
+#### Session 9 11:00AM - 12:30PM Building an R package (Kylie Bemis) ####
 
 - Why and when to build a package?
 - Directory layout of a package
@@ -168,7 +168,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #### 12:30PM - 1:30PM Lunch
 
-#### 1:30PM - 3:00PM Performance, profiling, debugging (Kylie Bemis) ####
+#### Session 10 1:30PM - 3:00PM Performance, profiling, debugging (Kylie Bemis) ####
 
 - Tools for CPU performance:
     + Rprof
@@ -187,7 +187,7 @@ knitr::opts_chunk$set(echo = TRUE)
     
 #### 3:00PM - 3:30PM Break
 
-#### 3:30PM - 5:00PM Scalability (Kylie Bemis) ####
+#### Session 11 3:30PM - 5:00PM Scalability (Kylie Bemis) ####
 
 - CPU scalability in R (single machine) w/ examples
     + parallel package (SNOW, multicore)
