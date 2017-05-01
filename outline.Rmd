@@ -1,6 +1,6 @@
 ---
 title: "Advanced R Outline of Topics"
-author: "JJ Allaire, Jan Vitek, Kylie Bemis, & Tsung-Heng Tsung"
+author: "JJ Allaire, Jan Vitek, Kylie Bemis, Tsung-Heng Tsai, and Sara Taheri"
 date: "4/27/2017"
 output: html_document
 ---
