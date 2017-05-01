@@ -17,7 +17,7 @@ Consistent workflow for both data wrangling and statistical modeling in the tidy
 
 ```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
-load("data/adv-R-twin.RData")
+load("../data/adv-R-twin.RData")
 ```
 
 
