@@ -31,9 +31,18 @@ knitr::opts_chunk$set(echo = TRUE)
     + Utility functions
     + Issues to be resolved
 
-#### Session 1 4:00PM - 5:00PM Introduction/overview of R (Jan Vitek) ####
+#### Session 1 4:00PM - 5:00PM Introduction to R (Jan Vitek) ####
 
-- TODO
+- Origin of R
+- What is R
+- What makes R special
+- R data structures
+- Attributes
+- Environments
+- Delayed evaluation
+- Vectorization
+- Subsetting
+
 
 #### Session 2 5:00PM - 6:00PM R Markdown and Github (Sara Taheri) ####
 
