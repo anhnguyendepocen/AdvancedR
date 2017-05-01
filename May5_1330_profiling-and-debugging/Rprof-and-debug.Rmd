@@ -10,14 +10,75 @@ output: html_document
 knitr::opts_chunk$set(message=FALSE, warning=FALSE)
 ```
 
-
 ## Learning goals
 
 1. What are common pitfalls in R performance?
 
-2. How to identify bottlenecks in CPU performance.
+2. How to identify and measure bottlenecks in CPU performance.
 
-3. How to identify bottlenecks in memory performance.
+3. How to identify and measure bottlenecks in memory performance.
 
 4. How to debug problem code in R.
+
+## Common pitfalls in R performance
+
+*The most common problem leading to slow code is unnecessary duplication of objects.*
+
+Often `for` loops are cited as a reason for slow performance in R. 
+
+While vectorization usually leads to increased performance, the primary culprit is typically the creation of extra copies of an object in memory.
+
+Consider the following code for generating normal random variables:
+
+- TODO: Add code
+
+## Tools for profiling CPU performance
+
+- `microbenchmark()` from the __microbenchmark__ package
+    + Times performance of small functions which may be called often
+    + Sample many calls of the function, so should not be used to time long-running code
+    + More accurate than `system.time()`
+
+- `Rprof()` and `summaryRprof()` from the __utils__ package
+    + Shows times used by different functions during executiono of a script
+    + Can be used to determine functions which are major bottlenecks
+
+
+## Tools for profiling memory performance
+
+- `mem_used` and `mem_changed` from __pryr__ package
+    + Prints the memory used by an object or the change in memory during execution of code
+    + Easy-to-read wrapper of `gc()` (which manually triggers R's garbage collector)
+
+- `tracemem()` and `untracemem()` from __base__ R
+    + Tracks whenever an object is duplicated by internal code
+    + Can be used to identify hard-to-predict memory use
+
+## What is going on with R and copying objects?
+
+- R is a *functional programming language*
+    + A common feature of functional languages is *immutable* state
+
+- Most objects in R are immutable
+    + Most attempts to *mutate* an object will create a *copy* of it and mutate the *copy*
+    
+- R tracks whether an object has multiple *references* to it; if it does, it will be copied
+    + View this with `refs` function from __pryr__ package
+
+For example:
+
+- TODO: Add code
+
+## Debugging R code
+
+- `traceback()`
+
+- `browser()`
+
+- `options(error=recover)`
+
+- `debug()` and `undebug()`
+
+
+
 

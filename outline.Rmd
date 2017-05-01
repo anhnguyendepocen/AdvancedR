@@ -184,7 +184,7 @@ knitr::opts_chunk$set(echo = TRUE)
     + microbenchmark
     + etc.
 - Tools for memory performance:
-    + Rprofmem
+    + tracemem
     + pryr (refs)
     + etc.
     + How to avoid copying

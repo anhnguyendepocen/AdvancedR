@@ -13,11 +13,75 @@ knitr::opts_chunk$set(message=FALSE, warning=FALSE)
 
 ## Learning goals
 
-1. How to scale CPU performance in R (on a single machine)?
+1. How to scale CPU performance in R.
 
-2. How to scale memory performance in R (on a single machine)?
+2. How to scale memory performance in R.
 
-3. What are some other tools for high-performance computing in R (on multiple machines)?
+3. Additional tools for high-performance computing in R.
 
-4. How to write C/C++ code for performance in R.
+4. How to write C/C++ code for R.
+
+## Scaling CPU performance in R
+
+In many situations, it is desireable to improve performance while still writing code in R. Parallelization is often an easy way to do this.
+
+There are several options for parallelization in R. These work best for problems which are *embarrasingly parallel*. Examples of such problems are:
+
+- Fitting the same kind of statistical model many times with multiple parameters
+
+- Fitting a Bayesian model by running multiple MCMC chains
+
+- Bootstrapping
+
+- Cross-validation
+
+Some of the easiest parallelization methods to use work by creating multiple R processes for executing your R code in parallel.
+
+- `parallel` package integrates two older packages
+    + `multicore` package (creates processes with UNIX forks)
+    + `SNOW` package (simple network of workstations)
+
+- `foreach` package can be integrated with multiple backends
+    + Write code using `foreach` function instead of `for` or `lapply`
+    + `doParallel` package implements parallel `foreach` backend using `parallel` package
+
+For example:
+
+- TODO: Add code
+
+## Scaling memory performance in R
+
+Another common problem in R is that it typically requires a dataset be fully loaded into memory. When a dataset is very large, this can make it difficult to work with it in R. When the dataset is larger than memory, it is often impossible to work with it at all.
+
+Compounding this difficulty, the frequency with which R makes copies of objects means that it is very easy to run out of memory when programming with large objects in R.
+
+However, there are a growing number of packages dedicated to working with large datasets in R, both in-memory and on-disk.
+
+- `bigmemory`
+
+- `ff`
+
+- `matter`
+
+- `HDF5Array`
+
+## Additional tools for high-performance computing in R
+
+## Writing C and C++ code for R
+
+Despite the usefulness of writing code in R, sometimes it can be useful to rewrite long-running functions in a more efficient language such as C or C++ to be called from R.
+
+Often, the best candidates for being rewritten in C or C++ are functions which involve many long-running `for` loops but which cannot be vectorized or further improved to reduce unnecessary duplication of objects.
+
+There are three common ways to write C or C++ code for R:
+
+- `.C` framework
+
+- `.Call` framework
+
+- `Rcpp` package
+
+Examples:
+
+- TODO: Add examples
 
