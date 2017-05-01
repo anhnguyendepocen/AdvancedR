@@ -1,0 +1,93 @@
+---
+title: "Object-oriented programming in R"
+author: "Advanced R"
+date: "Friday May 5, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message=FALSE, warning=FALSE)
+```
+
+
+## Learning goals
+
+1. Understand what is object-oriented programming and when to use it.
+
+2. What are the ways to use object-oriented programming in R?
+
+## What is object-oriented programming (OOP)?
+
+OOP is a way of organizing code around commonly re-used data "classes" and "methods".
+
+A **class** is a blueprint for a way of organizing data.
+
+- E.g., you might write a class for a proteomics experiment.
+
+An **object** is a particular instance of a class.
+
+- E.g., the twin case study is a particular instance of a proteomics experiment.
+
+Using **inheritance** allows *subclasses* to specialize *superclasses*.
+
+- E.g., a DIA or SRM class which specializes a proteomics experiment class.
+
+A **method** is a function associated with behavior specialized to a particular class. In __R__ this is done using *generic functions*.
+
+- E.g., `plot` is a generic function. A proteomics experiment class may have a `plot` method knows how to plot proteomics experiments.
+
+## A simple example
+
+Consider a pet simulator game. It may consist of the following elements:
+
+- An `Animal` class with subclasses `Cat` and `Dog`.
+
+- A generic function called `speak`.
+
+- A `speak` method for both the `Cat` and `Dog` classes
+
+- An object named `Mittens` as an instance of the `Cat` class
+
+- An object named `Duke` as an instance of the `Dog` class
+
+- `speak(Mittens)`
+    + `"Meow!"`
+
+- `speak(Duke)`
+    + `"Woof!"`
+
+## OOP in R
+
+There are two major object-oriented programming systems in R.
+
+- S3 classes
+    + Very simple class system
+    + No formal class definitions
+    + Single dispatch (methods only specialized on first argument)
+    + Single inheritance
+
+- S4 classes
+    + More complex class system
+    + Formal class definitions
+    + Multiple dispatch (methods specialized on multiple arguments)
+    + Multiple inheritance
+
+What are some common S3 classes you already use in R?
+
+- `factor`
+
+- `data.frame`
+
+What are some common S3 methods you already use in R?
+
+- `plot`
+
+- `summary`
+
+S3 is more common in base R and CRAN packages.
+
+S4 is more common in Bioconductor packages.
+
+
+
