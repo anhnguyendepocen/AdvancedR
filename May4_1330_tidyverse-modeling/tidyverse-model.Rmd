@@ -11,7 +11,7 @@ knitr::opts_chunk$set(message=FALSE, warning=FALSE)
 ```
 
 
-## Learning goal
+# Learning goal
 
 Consistent workflow for both data wrangling and statistical modeling in the tidyverse.
 
@@ -21,30 +21,27 @@ load("../data/adv-R-twin.RData")
 ```
 
 
-## Task
+# Task for the case study
 
 Model-based summary of feature log-intensities for all proteins in every run.
 
-* Model the log-intensities of features for each protein considering feature and run as fixed effects.
+* Model the log-intensities of features for each protein with `lm()` where feature and run are treated as fixed effects.
 
-* Run-level summarization with the fitted model.
+* Obtain run-level summarization with the fitted model.
 
 
-## Approaches
+We will discuss tools to perform modeling/testing in multiple groups (in this case, proteins) through the use of: 
 
-We will discuss tools to perform modeling/testing in multiple groups through the use of: 
-
-* `for()` loop.
-
+* `for` loop.
 * List-column.
 
 
-## Normalization
+# Normalization
 
 Same as in the previous section:
 
 ```{r}
-twin_dia <- tbl_df(twin_dia) %>% 
+twin_dia <- as_tibble(twin_dia) %>% 
     mutate(
         log2inty_h = log2(intensity_h), 
         log2inty_l = log2(intensity_l)
@@ -67,7 +64,7 @@ twin_dia2
 ```
 
 
-## Use linear model to summarize feature log-intensities of a protein
+# Use linear model to summarize feature log-intensities of a protein
 
 Model feature log-intensities with fixed effects of run and feature:
 
@@ -81,7 +78,7 @@ fit <- lm(log2inty_l ~ 0 + run + feature, data = sub_dia)
 ```
 
 
-### Extract run effect from the fitted model
+## Extract run effect from the fitted model
 
 ```{r}
 summary(fit)
@@ -99,16 +96,16 @@ coef(summary(fit))
 ```{r}
 fit_coef <- coef(fit)
 
-data_frame(effect = names(fit_coef), estimate = fit_coef) %>% 
+tibble(effect = names(fit_coef), estimate = fit_coef) %>% 
     filter(grepl("run", effect)) %>% 
     mutate(effect = gsub("run", "", effect))
 ```
 
 
-## Summarization for all proteins with a `for()` loop
+# Summarization for all proteins with a `for` loop
 
 
-### Approach 1
+## Approach 1
 
 * Loop over proteins.
 
@@ -125,7 +122,7 @@ for (i in seq_along(prots)) {
     fit <- lm(log2inty_l ~ 0 + run + feature, data = oneprot)  # Fit a linear model
     fit_coef <- coef(fit)  # Extract fitted parameters
     # Assemble the result in a data frame, and combine with those in previous iterations
-    df_oneprot <- data_frame(
+    df_oneprot <- tibble(
         protein = prots[i], 
         effect = names(fit_coef), 
         estimate = fit_coef
@@ -136,10 +133,10 @@ for (i in seq_along(prots)) {
 }
 ```
 
-We should avoid this approach as it's not very efficient - in every iteration, R has to copy all the data from previous iterations.
+This approach should be avoided as it's not very efficient - in every iteration, R has to copy all the data from previous iterations.
 
 
-### Approach 2
+## Approach 2
 
 * Loop over proteins.
 
@@ -151,13 +148,13 @@ We should avoid this approach as it's not very efficient - in every iteration, R
 
 ```{r}
 # Approach 2
-list_allprot <- vector("list", length = length(prots))
+list_allprot <- vector("list", length = length(prots))  # List to store output
 for (i in seq_along(prots)) {
     oneprot <- twin_dia2 %>% filter(protein == prots[i])  # Subset for one protein
     fit <- lm(log2inty_l ~ 0 + run + feature, data = oneprot)  # Fit a linear model
     fit_coef <- coef(fit)  # Extract fitted parameters
     # Assemble the result in a data frame, and save to the list
-    list_allprot[[i]] <- data_frame(
+    list_allprot[[i]] <- tibble(
         protein = prots[i], 
         effect = names(fit_coef), 
         estimate = fit_coef
@@ -172,19 +169,19 @@ The approaches discussed so far have two obvious drawbacks:
 
 1. The output objects of models are not tidy. Additional efforts are required to extract and reformat (tidy) summaries of interest, where different summaries may need different utility function to obtain.
 
-2. The fitted models were not saved. To extract additional (unplanned) summaries, we need to refit the models. Saving the models in another list is fine, but care is needed to link each model to its corresponding protein.
+2. The fitted models were not saved. To extract additional (unplanned) summaries, we need to refit the models. Saving the models in another list is fine, but care is needed to match each model with its corresponding protein.
 
 
-We now discuss better solution by using:  
+Better solutions in the tidyverse with the use of: 
 
-* Tidying methods for model objects in broom.
+* Tidying methods for model objects from the **broom** package.
 
 * List-columns.
 
 
-### broom
+# broom
 
-A library that turns model objects into data frames in tidy format with three tidying methods: 
+A package that turns model objects into data frames in tidy format with three tidying methods: 
 
 * `broom::tidy()`: to extract parameter-level summaries.
 
@@ -192,12 +189,12 @@ A library that turns model objects into data frames in tidy format with three ti
 
 * `broom::glance()`: to extract model-level summaries.
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 library(broom)
 ?broom
 ```
 
-Use broom to tidy output objects of models:
+Use broom to tidy up output objects of models:
 
 ```{r}
 fit <- lm(log2inty_l ~ 0 + run + feature, data = sub_dia)
@@ -212,15 +209,15 @@ augment(fit)
 glance(fit)
 ```
 
-We learned from the previous section how to obtain grouped summaries with arbitrary operations using `dplyr::group_by()` + `dplyr::do()`. We can now carry out the task with these tools.
+We learned from the previous section how to obtain grouped summaries with arbitrary operations by using `dplyr::group_by()` + `dplyr::do()`. We can now carry out the task with these tools.
 
 
-### Approach 3
+## Approach 3
 
 * Define the analysis unit (protein, in this case) with `dplyr::group_by()`.
 
 * Summarize for each protein, with operations passed through `dplyr::do()`:
-    + Fit a linear model for each protein with `lm()`.
+    + Fit a linear model with `lm()`.
     + Extract the estimates with `broom::tidy()`.
 
 ```{r}
@@ -232,10 +229,10 @@ twin_dia2 %>%
     mutate(term = gsub("run", "", term))
 ```
 
-Note that `dplyr::do()` requires explicit use of the `.`  placeholder, to indicate where the input gets passed on to operate. Multiple rows are generated from each model, each corresponds to a run-level summary of one protein. 
+Note that `dplyr::do()` requires explicit use of the `.`  placeholder, to indicate where the input (grouped data) gets passed on to operate. Multiple rows are generated from each model, each corresponds to a run-level summary of one protein. 
 
 
-### List-columns
+# List-columns
 
 As we discussed in the previous section, we can also save the fitted model for each protein in a new list-column: 
 
@@ -259,16 +256,16 @@ fit_dia %>% augment(fit)
 fit_dia %>% glance(fit)
 ```
 
-List-columns keep together related items in a data frame, thus allowing to perform operations in a data-structure-informed way. Their flexibility makes it convenient to be used as intermediate data structure for a variety of operations which may take different data formats. However, they are generally hard to work with as most R functions are developed for atomic vectors or data frames. To work effectively with list-columns, we need to develope techniques to 
+List-columns keep together related items in a data frame, thus allowing to perform operations in a structurally-informative fashion. Their flexibility makes it convenient to be used as intermediate data structure for a variety of operations which may take different data formats. To work effectively with list-columns, however, we need to develope techniques to 
 
 * Inspect their content and extract relevant parts for further operations.
 * Compute with functions developed to work with lists.
 * Simplify back to a data frame or atomic vector.
 
-We will use **nested data frame**, a particular instance of list-columns, as an example to discuss these techniques. Nested data frame is very useful to carry out the split-apply-combine strategy with arbitrary operations.
+We will use **nested data frame**, a particular instance of list-columns, as an example to discuss these techniques. Nested data frame is very useful for general applications of the split-apply-combine approach.
 
 
-### Nested data frame
+## Nested data frame
 
 Use `tidyr::nest()` to create a nested data frame: 
 
@@ -282,13 +279,12 @@ nested_dia
 Nested data frame organizes the data in a structurally-informative format where: 
 
 * Each row forms a group (e.g., protein).
-
-* The `data` column restores the stratified data corresponding to each protein, in a list (list-column).
+* The `data` column stores the stratified data corresponding to each protein, in a list (list-column).
 
 Inspect/extract data in the list with double brackets `[[]]`:
 
 ```{r}
-# Data of protein A1AG_BOVINE
+# Data for protein A1AG_BOVINE
 nested_dia$data[[1]]
 ```
 
@@ -297,19 +293,18 @@ nested_dia$data[[1]]
 nested_dia[[1, "data"]]
 ```
 
-`unnest()` removes the nested structure by repeating the regular columns for their corresponding element of the list-column.
+`unnest()` removes the nested structure by repeating the values in regular columns to match with their corresponding element in the list-column.
 
 ```{r}
 nested_dia %>% unnest(data)
 ```
 
-Library purrr provides a set of **map functions** to iterate over the list-columns with consistent syntax and return type, which makes it easy to operate on list-columns.
+The **purrr** package provides a set of **map functions** to iterate over the list-columns with consistent syntax, which makes it easy to operate on list-columns.
 
 
-### The map functions of purrr
+## The map functions of purrr
 
 `purrr::map(X, FUN)` loops over a vector `X`, applies some operation `FUN()` to each element of `X`, and saves the results as a list. 
-
 It's essentially `lapply()`. However, there are some advantages of using the map functions of purrr to work with list-columns:
 
 * Handy shortcuts to define anonymous functions.
@@ -353,7 +348,7 @@ nested_dia %>% unnest(param)
 ```
 
 
-### Approach 4
+## Approach 4
 
 * Create a nested data frame with `dplyr::group_by()` and `tidyr::nest()`.
 
@@ -381,13 +376,15 @@ nested_dia %>% unnest(param) %>%
     mutate(term = gsub("run", "", term))
 ```
 
-Approach 4 with nested data frame allows to explore the data in a principle way.
+Compared to the previous approaches, Approach 4 with nested data frame allows to explore the data in a principle way.
 
 
-## Reference
+# Resources
+
+* R for Data Science, Hadley Wickham and Garrett Grolemund
+    + http://r4ds.had.co.nz/iteration.html
+    + http://r4ds.had.co.nz/many-models.html
 
 * Jenny Bryan's purrr tutorial: https://jennybc.github.io/purrr-tutorial/
 
-* R for Data Science: 
-    + http://r4ds.had.co.nz/iteration.html
-    + http://r4ds.had.co.nz/many-models.html
+* broom on CRAN: https://cran.r-project.org/web/packages/broom/index.html

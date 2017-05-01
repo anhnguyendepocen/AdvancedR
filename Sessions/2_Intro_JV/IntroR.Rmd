@@ -1,5 +1,5 @@
 ---
-title: "A Tour of Advanced R"
+title: "A Tour of (advanced) R in Sixty Minutes"
 author: "Advanced R"
 date: "Wednesday May 3, 2017"
 output: html_document
@@ -9,19 +9,87 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Where from R?
+Set up: form pairs with neighbor. Identify quator with pairs next to you.  All assignments are done in pairs. Grading is done in quators.
 
-The R programming language has its roots in the S language developped over forty years ago at ATT Bell Labs by John Chambers, Rick Becker and Allan Wilks.
+# Origins
 
-The original impetus was to develop a glue language for library calls.  The statisticians at Bell labs had a rich set of libraries written in Fortran. But to call any of these libraries, one had to write Fortran code to read the data, then arrange the data in the layout expected by the library, the call the function and write code that would write the results out.
+The R programming language has its roots in S, a language created forty years ago at ATT Bell Labs by Chambers, Becker and Wilks.
 
-The goal of S was to hide all that and speed up the task of exploratory data analysis.
+The motivation for S was to simplify the task of calling statistical routines written in FORTRAN (this involved writing code to read in, format and write out the data).
 
-Another goal os S was to be an extensible language devoid of the arbitrary limitations that were enforced on Fortran programs.
+The goal of S was to free users of the drugery of writing that interface code and speed up the data analyst's workflow.  The key linguistic design principle was to design a language that could be extended and that was devoid of arbitary limitations.
 
-Over the years the language grew and its implementations improved in performance so much that it became possible to write statical anylsis code in S itself.
+The S language was such a success that users started writing statistical routines in S.
 
-The R programming language was designed by Ross Ihaka and Robert Gentleman at the University of Auckland around 1992.  R departed from S in number of ways, it was a resolutely open source language, it cleaned up some mistakes in the R design (such as lexical scoping which it took from Scheme), and improved execution performance.
+The R programming language was designed by Ross Ihaka and Robert Gentleman at the University of Auckland around 1992.  
+
+R departed from S in number of ways, it was an open source language released under a GPL license to ensure that everything related to R remains in the public domain, R cleaned up some corners of S and improve the performance of programs written in the language.
+
+#  R from first principles
+
+The basic building blocks of the language are surprisingly simple and elegant.
+
+## Functions
+
+The building block for creating abstractions in R is the *function declaration*.  These abstractions are used in *function calls*.
+
+```{r, eval=FALSE}
+f <- function( y ) {  y + 1 }
+f( 1 )
+```
+
+Function definitions in R consist of an argument list and a body. The argument list is a sequence of variable names (with optional default values) and possibly one occurrence of the tripe dot symbol (`...`).  The body of the function can be a single expression or a block (`{...}`).
+
+```{r, eval=FALSE}
+# the shortest function in the book
+function() 1    
+# multiple expressions in the body
+function( x ) { y <- x * x;  y + 1 }
+# default values, optional arguments
+function( x = 0, ..., y = 2)   if(length(z <- list(...) == 0)) x * y  else x * y * z[[1]] 
+```
+
+A function call consists of an expression that evaluates to a function followed by a (possibly empty) list of (possible named) arguments.
+
+```{r, eval=FALSE}
+f()
+# the shortest call of them all
+f(1,2)
+# positional calls pass arguments in order
+f(x = 1, y = 2)
+f(y = 2, x = 1)
+# named calls pass argument by name without a prescribed order
+(x[42])(x=1)
+# an expression that yields a function can be called
+```
+
+**Exercise 1:** write a definition of a function `f` that will return `0`, `-1`, `1`, `1` for the four calls to `f` above and a variable `x` such tgat the last call returns `-1`.
+
+```{r, eval=F}
+f <- function(y = 0, x = 0) x - y
+f()
+f(1,2)
+f(x = 1, y = 2)
+f(y = 2, x = 1)
+```
+
+The optional arguments have somewhat interesting semantics. In a function, any argument occuring after the three dots must be passed by name.  In the function body they can be passed as argument to a further call.
+
+```{r, eval=F}
+f <- function( x, ..., y) {  # y can only be passed by name
+   l1 <- c(...)  # the tree dots become an argument list
+   l2 <- c(x,...)
+   l3 <- c(y,...,x)
+   l1[1] + l2[2] + l3[3]
+}
+f(1,2,y=3)
+```
+
+**Exercise 2:** guess what value the call to `f` will return.
+
+The rationale for putting arguments after the three dots is for optional arguments rarely overriden.
+
+Function evaluation is complete when the last expression in the body 
 
 
 * Data structures
