@@ -1,0 +1,23 @@
+---
+title: "Performance, profiling, and debugging in R"
+author: "Advanced R"
+date: "Friday May 5, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message=FALSE, warning=FALSE)
+```
+
+
+## Learning goals
+
+1. What are common pitfalls in R performance?
+
+2. How to identify bottlenecks in CPU performance.
+
+3. How to identify bottlenecks in memory performance.
+
+4. How to debug problem code in R.
+

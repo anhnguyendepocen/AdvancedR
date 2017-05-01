@@ -1,0 +1,23 @@
+---
+title: "Scalability in R"
+author: "Advanced R"
+date: "Friday May 5, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message=FALSE, warning=FALSE)
+```
+
+
+## Learning goals
+
+1. How to scale CPU performance in R (on a single machine)?
+
+2. How to scale memory performance in R (on a single machine)?
+
+3. What are some other tools for high-performance computing in R (on multiple machines)?
+
+4. How to write C/C++ code for performance in R.
+
