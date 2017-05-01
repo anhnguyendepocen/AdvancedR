@@ -1,0 +1,54 @@
+---
+title: "Building R packages"
+author: "Advanced R"
+date: "Friday May 5, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message=FALSE, warning=FALSE)
+```
+
+
+## Learning goals
+
+1. When is it a good idea to build your own R packages?
+
+2. How to build R packages
+
+3. What are some other useful tools for building R packages?
+
+## Why build an R package?
+
+Even if you are not planning on distributing your code, building an R package has many advantages over `source()`-ing your R scripts.
+
+- Easily manage and organize your code
+
+- Portably re-use your code
+
+- Documentation for your code
+
+- Make dependencies on other packages explicit
+
+- Distribute your code! (internally or externally)
+
+## What is an R package?
+
+An R package is really just a directory with certain required files and subdirectories. The directory layout of an R package is:
+
+- `PACKAGE_NAME/`
+    + `DESCRIPTION` : A structured description of the package
+    + `NAMESPACE` : Imports package dependencies and exports your functions and classes
+    + `R/` : All your R code lives here
+    + `man/` : Documentation of exported R functions and classes
+    + `src/` : Foreign (C, C++, Fortran, etc.) code lives here
+    + `inst/` : Miscellaneous files to move into the package directory when installed
+    + `data/` : `.RData` or `.rda` data files used by the package
+    + `tests/` : Unit tests for the package's functions and classes
+    + `vignettes/` : Vignettes illustrating the package's use
+    + `NEWS` : Changelog for the package
+
+A simple skeleton for an R package can be created using the `package.skeleton` function in the __utils__ package.
+
+
