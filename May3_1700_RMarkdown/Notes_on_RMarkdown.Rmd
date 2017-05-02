@@ -80,9 +80,7 @@ summary(cars)
 
 ## Only display the result and hide codes
 
-If you do not want to include the codes in the output of the file but you want to show the results of running the code, set `echo = FALSE`. This will prevent printing of the R code that generated the plot. 
-
-Here is an example:
+If you do not want to include the codes in the output of the file but you want to show the results of running the code, set `echo = FALSE`. This will prevent printing of the R code that generated the plot. You can also set the width and height of your plot like this:
 
 ```{r, fig.height=4, fig.width = 6, echo=FALSE,fig.align='center'}
 library(png)
@@ -93,10 +91,13 @@ grid.raster(img)
 
 The result of this is as follows:
 
-```{r pressure, echo=FALSE}
+```{r pressure, echo=FALSE, fig.width= 4, fig.height= 4}
 plot(x = c(1,2,3,5,3,6), y = c(1,4,2,6,3,5), main = " This is my plot",
      xlab = "pressure", ylab = "temperature")
 ```
+
+As you can see, in the result, no code is shown.
+
 
 ## Only display the codes and hide the results
 
@@ -119,4 +120,24 @@ cor(x, y)
 
 You can see that the result of cor(x,y) is not produced.
 
-For more details on using R Markdown see [here](http://rmarkdown.rstudio.com).
+## Add caption to your plot
+
+If you want your plot to has a caption, you can add fig.cap="my caption" to the arguments of your chunk, like this:
+
+```{r, fig.height=4, fig.width = 6, echo=FALSE,fig.align='center'}
+library(png)
+library(grid)
+img <- readPNG("./fig/plotCaption.png")
+grid.raster(img)
+```
+
+The result is in figure 1:
+
+```{r pressure1, echo=FALSE, fig.width= 4, fig.height= 4, fig.cap= "This plot shows the relationship between the pressure of a romm and the temperature of it."}
+plot(x = c(1,2,3,5,3,6), y = c(1,4,2,6,3,5), main = " This is my plot",
+     xlab = "pressure", ylab = "temperature")
+```
+
+For more details on using R Markdown see [here](http://rmarkdown.rstudio.com). [Here](http://commonmark.org/help/tutorial/) is a step by step turorial that introduces single Makdown concepts at each step.
+
+You can also create your posters with RMarkdown easily. [Here](https://github.com/odeleongt/flexdashboard-poster) you can find more information about it.
