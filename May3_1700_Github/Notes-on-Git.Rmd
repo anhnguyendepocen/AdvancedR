@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # What is Git and Github and why is it usefull to use them for version controlling of our projects?
 
 \begin{center}
-\includegraphics[width=0.5\textwidth]{gitMotive.pdf}
+\includegraphics[width=0.5\textwidth]{fig/gitMotive.pdf}
 \end{center}
 
 \textbf{situation 1}
@@ -44,14 +44,14 @@ Every time you save your work, Git creates a \textbf{commit}. A commit is a snap
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./commit_chain.png")
+img <- readPNG("./fig/commit_chain.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center',fig.cap="The red line is the line that was deleted and the green lines are the ones that are added to the file."}
 library(png)
 library(grid)
-img <- readPNG("./commitRedGreen.png")
+img <- readPNG("./fig/commitRedGreen.png")
 grid.raster(img)
 ```
 
@@ -64,7 +64,7 @@ Each time someone wants to work on the project has to pull first, then edit the 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./pushpullRepository.png")
+img <- readPNG("./fig/pushpullRepository.png")
 grid.raster(img)
 ```
 (From https://github.com/Rafase282/My-FreeCodeCamp-Code/wiki/Lesson-Save-your-Code-Revisions-Forever-with-Git)
@@ -95,21 +95,21 @@ Other Linux distros: Download Git from [here](http://git-scm.com/download/linux)
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./creatRepository.png")
+img <- readPNG("./fig/creatRepository.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width=4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./creatRepository1.png")
+img <- readPNG("./fig/creatRepository1.png")
 grid.raster(img)
 ```
 
 ```{r,fig.height=4, fig.width=4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./copyURL.png")
+img <- readPNG("./fig/copyURL.png")
 grid.raster(img)
 ```
 
@@ -126,28 +126,28 @@ grid.raster(img)
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./file_new_project.png")
+img <- readPNG("./fig/file_new_project.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./RStudioVersionControl.png")
+img <- readPNG("./fig/RStudioVersionControl.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./GitClone.png")
+img <- readPNG("./fig/GitClone.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./GitClone_Subdirectory.png")
+img <- readPNG("./fig/GitClone_Subdirectory.png")
 grid.raster(img)
 ```
 
@@ -166,56 +166,56 @@ grid.raster(img)
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./README.png")
+img <- readPNG("./fig/README.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=6, fig.width = 6, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./changeReadMe.png")
+img <- readPNG("./fig/changeReadMe.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./commitIcon.png")
+img <- readPNG("./fig/commitIcon.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./firstCommit.png")
+img <- readPNG("./fig/firstCommit.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./pushBranch.png")
+img <- readPNG("./fig/pushBranch.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./pushBranchWindow.png")
+img <- readPNG("./fig/pushBranchWindow.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./first_commit.png")
+img <- readPNG("./fig/first_commit.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./changes_in_README.png")
+img <- readPNG("./fig/changes_in_README.png")
 grid.raster(img)
 ```
 
@@ -236,70 +236,70 @@ grid.raster(img)
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./new_RScript.png")
+img <- readPNG("./fig/new_RScript.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./save_RScript.png")
+img <- readPNG("./fig/save_RScript.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./write_simple_codes.png")
+img <- readPNG("./fig/write_simple_codes.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./choose_commit.png")
+img <- readPNG("./fig/choose_commit.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./check_my_codes_onLeft.png")
+img <- readPNG("./fig/check_my_codes_onLeft.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./write_some_comments.png")
+img <- readPNG("./fig/write_some_comments.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./close_window.png")
+img <- readPNG("./fig/close_window.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./pushBranch.png")
+img <- readPNG("./fig/pushBranch.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./second_commit.png")
+img <- readPNG("./fig/second_commit.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./changes_push_github_server.png")
+img <- readPNG("./fig/changes_push_github_server.png")
 grid.raster(img)
 ```
 
@@ -321,21 +321,21 @@ read [this](https://www.r-bloggers.com/version-control-with-git/) and [this](htt
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./new_collaborator_setting.png")
+img <- readPNG("./fig/new_collaborator_setting.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./options_collaborators.png")
+img <- readPNG("./fig/options_collaborators.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./collaborator_name.png")
+img <- readPNG("./fig/collaborator_name.png")
 grid.raster(img)
 ```
 
@@ -384,70 +384,70 @@ lines between these signs are the source of conflict. You can decide whether to 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./click_on_my_codes.png")
+img <- readPNG("./fig/click_on_my_codes.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./edit_this_file.png")
+img <- readPNG("./fig/edit_this_file.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./comit_changes.png")
+img <- readPNG("./fig/comit_changes.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./push_branch_conflict.png")
+img <- readPNG("./fig/push_branch_conflict.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./push_error.png")
+img <- readPNG("./fig/push_error.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./pull_error.png")
+img <- readPNG("./fig/pull_error.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./commit_conflict.png")
+img <- readPNG("./fig/commit_conflict.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./conflict_signs.png")
+img <- readPNG("./fig/conflict_signs.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./commit_after_conflict.png")
+img <- readPNG("./fig/commit_after_conflict.png")
 grid.raster(img)
 ```
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
-img <- readPNG("./conflict_solved_commit.png")
+img <- readPNG("./fig/conflict_solved_commit.png")
 grid.raster(img)
 ```
 
