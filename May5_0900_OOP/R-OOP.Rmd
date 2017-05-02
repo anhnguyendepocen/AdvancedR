@@ -145,7 +145,7 @@ S3 generic functions are defined by a body consisting of `UseMethod("name")` (wh
 
 S3 methods are then defined by the naming scheme `name.class()`.
 
-Available methods can be listed using the `methods()` function.
+Available S3 methods can be listed using the `methods()` function.
 
 What are some common S3 methods you already use in R?
 
@@ -166,7 +166,7 @@ head(methods("summary")) # 'summary' also has many methods
 
 S3 methods are how R (almost) always knows how to print, plot, summarize, etc. whatever objects you give it, appropriately for each object type.
 
-## Create an S3 class and methods
+## Create an S3 class with S3 methods
 
 Earlier, we learned how to write functions and how to normalize, summarize, and plot proteomics experiments.
 
@@ -229,7 +229,7 @@ Now, we write a `normalize` method for our class. Since `normalize` is not alrea
 ```{r}
 normalize <- function(object, ...) UseMethod("normalize")
 
-normalize.S3ProteomicsExperiment <- function(object, ..., by) {
+normalize.S3ProteomicsExperiment <- function(object, by, ...) {
   if ( !attr(object, "log2") ) {
     object$intensity <- log2(object$intensity)
     attr(object, "log2") <- TRUE
@@ -256,25 +256,199 @@ summary.S3ProteomicsExperiment <- function(object, ...) {
          function(x) log2(sum(x, na.rm=TRUE)))
 }
 
-plot.S3ProteomicsExperiment <- function(object, ...) {
-  if ( attr(object, "log2") ) {
+plot.S3ProteomicsExperiment <- function(x, y, ...) {
+  if ( attr(x, "log2") ) {
     ylab <- "log2(intensity)"
   } else {
     ylab <- "intensity"
   }
-  boxplot(object$intensity ~ object$run, xlab="run", ylab=ylab)
+  boxplot(x$intensity ~ x$run, xlab="run", ylab=ylab)
 }
 ```
 
 Now we can do:
 
 ```{r}
-exp2 <- normalize(exp1, by="heavy")
-head(summary(exp2)[,,"light"])
-plot(exp2)
+exp1norm <- normalize(exp1, by="heavy")
+head(summary(exp1norm)[,,"light"])
+plot(exp1norm)
 ```
 
-## Create an S4 class and methods
+## All about S4 classes
 
+S4 classes are rare in base R, but are more common in Bioconductor packages. S4 classes have formal class definitions and more rigorous structure, making them tedious to use for simpler data structures, but very useful for more complex data structures.
 
+S4 classes are defined by the `setClass` function. They have named `slots` of specified types, and can define a `validObject` method that checks whether certain validity conditions are met.
 
+Class definitions can be examined with the `getClass` function.
+
+Although `data.frame` is an S3 class, the `methods` package also provides an S4 version of many S3 classes, including `data.frame`.
+
+```{r}
+getClass("data.frame")
+```
+
+Here, we see that the S4 version of `data.frame` has the following slots:
+
+- `.Data` is a `list`
+
+- `names` is a `character`
+
+- `row.names` is a special class called `data.frameRowLabels`
+
+- `.S3Class` is a `character`
+
+You define what slots a class has and what they are when you define the class using `setClass`.
+
+Let's define an S4 class called `S4ProteomicsExperiment` that inherits from `data.frame`.
+
+```{r}
+setClass("S4ProteomicsExperiment",
+         contains="data.frame",
+         slots=c(log2 = "logical",
+                 title = "character"),
+         validity=function(object) {
+           reqCols <- c("protein", "feature",
+                        "run", "intensity", "label")
+           msngCols <- !reqCols %in% object@names
+           if ( any(msngCols) ) {
+             msngNames <- paste0(reqCols[msngCols], collapse=" ")
+             paste0("missing columns: ", msngNames)
+           } else {
+             TRUE
+           }
+         })
+```
+
+Notice that slots of S4 objects are accessed via `object@slotname`. However, users should not access slots this way. Typically, accessor functions are defined for this purpose.
+
+For example, above, we accessed the `names` slot using `object@name`. However, users should access the `names` using `names(object)` and set them via `names(object) <- value`. (These getter and setter functions already exist for us since we extend the `data.frame` class.)
+
+Although S4 objects can be created using the `new` function, it's good form to write a constructor for our class, too.
+
+```{r}
+S4ProteomicsExperiment <- function(protein, feature, run, intensity, label, ..., title="My First Proteomics Experiment",
+                                   log2 = FALSE)
+{
+  dots <- list(...)
+  if ( length(dots) > 0 ) {
+    object <- data.frame(protein=protein, feature=feature,
+         run=run, intensity=intensity, label=label, list(...)) 
+  } else {
+    object <- data.frame(protein=protein, feature=feature,
+         run=run, intensity=intensity, label=label) 
+  }
+  new("S4ProteomicsExperiment", object, title=title, log2=log2)
+}
+```
+
+```{r}
+exp2 <- S4ProteomicsExperiment(protein=twin_dia2$protein,
+                               feature=twin_dia2$feature,
+                               run=twin_dia2$run,
+                               intensity=twin_dia2$intensity,
+                               label=twin_dia2$label,
+                               title="Twin DIA Experiment")
+head(exp2)
+```
+
+## All about S4 generic functions
+
+S4 generic functions are defined using `setGeneric`. If `setGeneric` is given the name of an existing function, it will convert it into a generic function, and use the existing version as the default method.
+
+You can use `getGeneric()` or `isGeneric()` to check if an S4 generic function already exists.
+
+```{r}
+isGeneric("normalize")
+isGeneric("summary")
+isGeneric("plot")
+```
+
+Currently, no S4 generics exist for `normalize`, `summary`, or `plot`, so we will create them.
+
+```{r}
+setGeneric("normalize")
+setGeneric("summary")
+setGeneric("plot")
+```
+
+Now the S4 generics exist:
+
+```{r}
+getGeneric("normalize")
+getGeneric("summary")
+getGeneric("plot")
+```
+
+We can use `showMethods()` and `selectMethod()` to find the available S4 methods for an S4 generic funciton.
+
+```{r}
+showMethods("normalize")
+selectMethod("normalize", "ANY")
+```
+
+We can see that the default S4 method for `normalize` is the S3 generic function we defined earlier.
+
+## All about S4 methods
+
+S4 methods are defined using the `setMethod` function. S4 methods are distinguished by their *signature*, which defines the classes of their formal arguments.
+
+While S3 methods could only dispatch on a single class, S4 methods can dispatch on multiple arguments.
+
+For example, consider the S4 generic function for `plot`:
+
+```{r}
+getGeneric("plot")
+```
+
+While the S3 `plot` methods only depend on the class of `x`, S4 methods can depend on the class of both `x` *and* `y`. While not all developers will take advantage of this, it is one way that S4 methods are more powerful and more complex than S3 methods.
+
+Let's define our S4 `normalize`, `summary`, and `plot` methods using `setMethod()` now.
+
+```{r}
+setMethod("normalize", "S4ProteomicsExperiment",
+          function(object, by, ...) {
+  if ( !object@log2 ) {
+    object$intensity <- log2(object$intensity)
+    object@log2 <- TRUE
+  }
+  std <- object$label == by
+  medians <- tapply(object$intensity[std], object$run[std],
+                    median, na.rm=TRUE)
+  gbl_median <- median(medians, na.rm=TRUE)
+  object$intensity <- object$intensity - medians[object$run] + gbl_median
+  if ( validObject(object) )
+    object
+})
+
+setMethod("summary", "S4ProteomicsExperiment",
+          function(object, ...) {
+  if ( object@log2 )
+    object$intensity <- 2^object$intensity
+  tapply(object$intensity,
+         list(run=object$run,
+              protein=object$protein,
+              label=object$label),
+         function(x) log2(sum(x, na.rm=TRUE)))
+})
+
+setMethod("plot", "S4ProteomicsExperiment",
+          function(x, y, ...) {
+  if ( x@log2 ) {
+    ylab <- "log2(intensity)"
+  } else {
+    ylab <- "intensity"
+  }
+  boxplot(x$intensity ~ x$run,
+          xlab="run", ylab=ylab,
+          title=x@title)
+})
+```
+
+Now we can do:
+
+```{r}
+exp2norm <- normalize(exp2, by="heavy")
+head(summary(exp2norm)[,,"light"])
+plot(exp2norm)
+```
