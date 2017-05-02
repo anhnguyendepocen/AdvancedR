@@ -10,11 +10,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 ## Markdown
 
-Markdown is a text-to-HTML conversion tool for web writers. Markdown allows you to write using an easy-to-read, easy-to-write plain text format, then convert it to structurally valid XHTML (or HTML).
+Markdown is a text-to-HTML conversion tool for web writers. Markdown allows you to write using an easy-to-read, easy-to-write plain text format, then convert it to structurally valid XHTML (or HTML)\footnote{from : http://daringfireball.net/projects/markdown/}.
 
 ## R Markdown
 
-R-Markdown is a flavor of markdown which allows R-users to embed R code into a markdown document. The document is then ‘knit’ using knitr to create a HTML, PDF, and MS Word documents.
+R-Markdown is a flavor of markdown which allows R-users to embed R code into a markdown document\footnote{https://www.r-bloggers.com/r-markdown-and-knitr-tutorial-part-1/}. With R Markdown you can  create HTML, PDF, and MS Word documents.
 
 ## How to create a R Markdown file
 
@@ -45,7 +45,7 @@ img <- readPNG("./fig/Knit.png")
 grid.raster(img)
 ```
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. In order to create an R chunk, click on "Code" and then select "insert chunk".
+When you click the Knit button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. In order to create an R chunk, click on "Code" and then select "insert chunk".
 
 ```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
