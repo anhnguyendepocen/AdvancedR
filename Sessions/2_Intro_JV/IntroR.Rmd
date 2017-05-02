@@ -124,15 +124,56 @@ e$c <- 2.3
 e$d <- 1:3
 ```
 
-![An environent.](http://adv-r.had.co.nz/diagrams/environments.png/bindings.png)
+![An environment refers to values in memory.](http://adv-r.had.co.nz/diagrams/environments.png/bindings.png)
 
 Environments can be chained by assigning to their *parent environment*.  Looking up names using `get("x", env=e)` will find the first binding for `x` in the sequence of environments starting at `e` and following the `parent` chain.
+
 
 ```{r}
 f <- new.env()
 parent.env(f) <- e
 get("c", env=f)
 ```
+
+Environments are used to hold the variables and parameters of a function.  The chaining is used to implement lexical scoping.
+
+```{r}
+f <- function() {
+   x <- 42
+   function() x
+}
+x <- -42
+```
+
+**Exercise 4:** what will the value of the expression `f()()`?  
+
+Environment are also used to implement the namespaces that are exported by packages.
+
+Consider the `sd` function, it is provided by the `stats` package.
+
+```{r, eval=F}
+environment(sd)
+#> <environment: namespace:stats>
+where("sd")
+#> <environment: package:stats>
+```
+
+The definition of `sd()` uses funcion `var()`, but if we make our own version of `var()` it doesn’t affect `sd()`:
+
+```{r,eval=F}
+x <- 1:10
+sd(x)
+## [1] 3.02765
+var <- function(x, na.rm = TRUE) 100
+sd(x)
+## [1] 3.02765
+```
+
+![](http://adv-r.had.co.nz/diagrams/environments.png/namespace.png)
+
+When we type `var` into the console, it’s found first in the global environment. When `sd()` looks for `var()` it finds it first in its namespace environment so never looks in the `globalenv()`.
+
+
 
 
 
