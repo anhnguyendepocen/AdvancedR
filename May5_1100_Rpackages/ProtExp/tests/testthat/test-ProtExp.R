@@ -31,21 +31,21 @@ test_that("ProtExp methods works", {
     rename(heavy = intensity_h, light = intensity_l) %>% 
     gather(label, intensity, heavy, light)
   
-  exp1 <- ProtExp(protein=twin_dia2$protein,
+  data1 <- ProtExp(protein=twin_dia2$protein,
                   feature=twin_dia2$feature,
                   run=twin_dia2$run,
                   intensity=twin_dia2$intensity,
                   label=twin_dia2$label)
 
-  expect_is(exp1, "ProtExp")
+  expect_is(data1, "ProtExp")
     
-  expect_is(exp1, "data.frame")
+  expect_is(data1, "data.frame")
 
-  exp1norm <- normalize(exp1, by="heavy")
+  data1norm <- normalize(data1, by="heavy")
   
-  exp1summ <- summary(exp1norm)
+  data1summ <- summary(data1norm)
   
-  expect_equal(exp1summ["R001","A1AG_BOVINE","light"],
+  expect_equal(data1summ["R001","A1AG_BOVINE","light"],
                18.29013, tolerance=0.01)
     
 })

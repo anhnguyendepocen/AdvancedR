@@ -27,7 +27,7 @@ In many situations, it is desireable to improve performance while still writing 
 
 There are several options for parallelization in R. These work best for problems which are *embarrasingly parallel*. Examples of such problems are:
 
-- Fitting the same kind of statistical model many times with multiple parameters
+- Fitting the many statistical models at once
 
 - Fitting a Bayesian model by running multiple MCMC chains
 
@@ -45,9 +45,134 @@ Some of the easiest parallelization methods to use work by creating multiple R p
     + Write code using `foreach` function instead of `for` or `lapply`
     + `doParallel` package implements parallel `foreach` backend using `parallel` package
 
-For example:
+#### Using __parallel__ 
 
-- TODO: Add code
+Earlier, we fit a linear model for each protein in the `twin_dia` example dataset. Since this dataset is relatively small, this did not take too long, but for a larger dataset, it may be more efficient to do this in parallel.
+
+We will do this using the __parallel__ package.
+
+```{r}
+library(parallel)
+detectCores()
+```
+
+First, we set up the dataset.
+
+```{r}
+library(ProtExp)
+library(tidyverse)
+library(broom)
+
+data(twin)
+
+twin_dia2 <- twin_dia %>%
+  rename(heavy = intensity_h, light = intensity_l) %>% 
+  gather(label, intensity, heavy, light)
+
+twin_dia3 <- ProtExp(protein=twin_dia2$protein,
+                               feature=twin_dia2$feature,
+                               run=twin_dia2$run,
+                               intensity=twin_dia2$intensity,
+                               label=twin_dia2$label)
+twin_dia3 <- normalize(twin_dia3, by="heavy")
+
+twin_dia3 <- twin_dia3 %>% filter(label == "light")
+```
+
+First, let's create a simple function that fits a linear model for a single protein.
+
+```{r}
+lmFit <- function(data) {
+  lm(intensity ~ 0 + run + feature, data=data)
+}
+```
+
+Now we group the data by protein and create a nested data.frame.
+
+```{r}
+fit_dia <- twin_dia3 %>% 
+    group_by(protein) %>% 
+    nest()
+```
+
+We try fitting the model to all proteins sequentially using `lapply` first.
+
+```{r}
+system.time(fit_dia$fit1 <- lapply(fit_dia$data, lmFit))
+head(tidy(fit_dia$fit1[[1]]))
+```
+
+The above fitting takes about ~5 seconds on my laptop.
+
+Now we try fitting the models in parallel. The easiest way to do this is by using `mclapply` from the __parallel__ package. This creates additional R processes by forking the host R process.
+
+```{r}
+system.time(fit_dia$fit2 <- mclapply(fit_dia$data, lmFit))
+head(tidy(fit_dia$fit2[[1]]))
+```
+
+Fitting the models in parallel using `mclapply` takes only about ~4 seconds on my laptop.
+
+*Note: Because it does not take very long to fit these models, the speedup by fitting them in parallel is not very dramatic. Forking the R process and transferring the results back to the host process is a significant proportion of the total execution time. However, if there were many more proteins, or each model took a longer time to fit, the speedup from parallelization would be more dramatic.*
+
+Although `mclapply` is simple, a drawback to it is that it is not available on Windows, since it uses UNIX forking.
+
+We can delve deeper into the __parallel__ package and create a PSOCK cluster on our machine, which works on all systems.
+
+```{r}
+cl <- makePSOCKcluster(detectCores())
+system.time(fit_dia$fit3 <- parLapply(cl, fit_dia$data, lmFit))
+stopCluster(cl)
+head(tidy(fit_dia$fit3[[1]]))
+```
+
+Fitting the models in parallel using `parLapply` takes only about ~2 seconds on my laptop. It appears that the cost of setting up and tearing down the cluster (which we did manually this time, and did not include in the timing) also has a significant overhead.
+
+#### Using __foreach__ with a registered backend
+
+A drawback of using functions like `mclapply` and `parLapply` from the __paralell__ package is that -- while the opportunity cost is very low -- you must still use a different function whenever you want to run code in parallel. This means deciding when and where to use `lapply` versus `parLapply`, for example. If you're writing a package, you cannot count on users always having multiple cores, or always wanting to pass a cluster object to functions like `parLapply`.
+
+The __foreach__ package offers a flexible framework for writing code that can run either sequentially or in parallel without making any changes to it.
+
+```{r}
+library(foreach)
+```
+
+How does this work? We start by rewriting our model fitting to use `foreach` instead of `lapply`. This is simply, because `foreach` behaves very similarly to `lapply`.
+
+```{r}
+system.time({
+  fit_dia$fit4 <- foreach(data = fit_dia$data) %do% lmFit(data)
+})
+```
+
+This is run sequentially, and takes about ~5 seconds on my laptop, just like `lapply`.
+
+To allow it to run in parallel, we make only one small change:
+
+```{r}
+system.time({
+  fit_dia$fit4 <- foreach(data = fit_dia$data) %dopar% lmFit(data)
+})
+```
+
+This still runs in ~5 seconds, and gives a warning that it found no parallel backend registered, so `foreach` fell back to running it sequentially.
+
+We can register a backend using the __doParallel__ package, which uses the clusters from the __parallel__ package. There are other packages which provide backends for other implementations of parallelization as well.
+
+```{r}
+library(doParallel)
+registerDoParallel(detectCores())
+system.time({
+  fit_dia$fit4 <- foreach(data = fit_dia$data) %dopar% lmFit(data)
+})
+head(tidy(fit_dia$fit4[[1]]))
+```
+
+This runs in about ~2 seconds on my laptop, just like `parLapply`.
+
+Using `foreach` allows writing code that can be run either sequentially or in parallel, but leaves it up to the user to register a parallel backend. A user may register whatever parallel backend they like, without you having to code for it specifically.
+
 
 ## Scaling memory performance in R
 
@@ -57,15 +182,14 @@ Compounding this difficulty, the frequency with which R makes copies of objects 
 
 However, there are a growing number of packages dedicated to working with large datasets in R, both in-memory and on-disk.
 
-- `bigmemory`
+- `bigmemory` on CRAN
+    + Uses shared memory to allow 
 
-- `ff`
+- `ff` on CRAN
 
-- `matter`
+- `matter` on Bioconductor
 
-- `HDF5Array`
-
-## Additional tools for high-performance computing in R
+- `HDF5Array` on Bioconductor
 
 ## Writing C and C++ code for R
 
