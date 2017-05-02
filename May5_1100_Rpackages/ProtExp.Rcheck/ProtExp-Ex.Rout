@@ -1,0 +1,108 @@
+
+R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "ProtExp"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> library('ProtExp')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("is_log_trans")
+> ### * is_log_trans
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: is_log_trans
+> ### Title: Is a dataset log-transformed?
+> ### Aliases: is_log_trans is_log_trans<- is_log_trans.default
+> ###   is_log_trans<-.default
+> 
+> ### ** Examples
+> 
+> x <- structure("test", is_log_trans = TRUE)
+> is_log_trans(x)
+[1] TRUE
+> is_log_trans(x) <- FALSE
+> is_log_trans(x)
+[1] FALSE
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("twin")
+> ### * twin
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: twin
+> ### Title: Twin DIA and SRM experiments
+> ### Aliases: twin
+> 
+> ### ** Examples
+> 
+> data(twin)
+> head(twin_dia)
+      protein             feature  run pair zygosity subject visit intensity_h
+1 A1AG_BOVINE AIQAAFFYLEPR_2_y3_1 R001    1       MZ       1     1          NA
+2 A1AG_BOVINE AIQAAFFYLEPR_2_y3_1 R002    1       MZ       1     2          NA
+3 A1AG_BOVINE AIQAAFFYLEPR_2_y3_1 R003    1       MZ       2     1          NA
+4 A1AG_BOVINE AIQAAFFYLEPR_2_y3_1 R004    1       MZ       2     2          NA
+5 A1AG_BOVINE AIQAAFFYLEPR_2_y3_1 R005    2       MZ       3     1          NA
+6 A1AG_BOVINE AIQAAFFYLEPR_2_y3_1 R006    2       MZ       3     2          NA
+  intensity_l
+1       27742
+2       31572
+3       24084
+4       33134
+5       23468
+6       27247
+> head(twin_srm)
+      protein             feature  run pair zygosity subject visit intensity_h
+1 A1AG_BOVINE AIQAAFFYLEPR_2_y4_1 R001    1       MZ       1     1          NA
+2 A1AG_BOVINE AIQAAFFYLEPR_2_y4_1 R002    1       MZ       1     2          NA
+3 A1AG_BOVINE AIQAAFFYLEPR_2_y4_1 R003    1       MZ       2     1          NA
+4 A1AG_BOVINE AIQAAFFYLEPR_2_y4_1 R004    1       MZ       2     2          NA
+5 A1AG_BOVINE AIQAAFFYLEPR_2_y4_1 R005    2       MZ       3     1          NA
+6 A1AG_BOVINE AIQAAFFYLEPR_2_y4_1 R006    2       MZ       3     2          NA
+  intensity_l
+1      123600
+2      128340
+3      134619
+4      122007
+5       42467
+6       74795
+> 
+> 
+> 
+> ### * <FOOTER>
+> ###
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  0.24 0.017 0.258 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

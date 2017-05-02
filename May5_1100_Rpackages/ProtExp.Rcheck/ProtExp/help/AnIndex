@@ -1,0 +1,8 @@
+is_log_trans	is_log_trans
+is_log_trans.default	is_log_trans
+is_log_trans<-	is_log_trans
+is_log_trans<-.default	is_log_trans
+normalize	normalize
+normalize.ProtExp	normalize
+ProtExp	ProtExp
+twin	twin

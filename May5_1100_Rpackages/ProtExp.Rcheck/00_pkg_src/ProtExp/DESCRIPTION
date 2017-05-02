@@ -1,0 +1,18 @@
+Package: ProtExp
+Type: Package
+Title: An Example Package for Proteomics Experiments
+Version: 1.0
+Date: 2017-05-02
+Author: NEU May Institute Advanced R Course
+Description: ProtExp is an example package illustrating
+			several R concepts for building packages
+			for analysis of proteomics experiments.
+Maintainer: Nobody <nobody@no.where>
+License: Artistic-2.0
+LazyData: true
+Depends: methods
+Suggests: tidyverse, knitr
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1
+NeedsCompilation: no
+Packaged: 2017-05-02 14:33:27 UTC; kuwisdelu

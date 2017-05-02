@@ -187,7 +187,7 @@ Because S3 classes are not rigorously defined by anything except the `class` att
 We decide, at minimum, a valid proteomics experiment should have proteins, features, intensities, labels, and runs. For simplicity, our proteomics experiment class will inherit from `data.frame`.
 
 ```{r}
-S3ProteomicsExperiment <- function(protein, feature, run, intensity, label, ..., log2 = FALSE)
+S3ProteomicsExperiment <- function(protein, feature, run, intensity, label, ..., is_log_trans = FALSE)
 {
   dots <- list(...)
   if ( length(dots) > 0 ) {
@@ -197,7 +197,7 @@ S3ProteomicsExperiment <- function(protein, feature, run, intensity, label, ...,
     object <- data.frame(protein=protein, feature=feature,
          run=run, intensity=intensity, label=label) 
   }
-  attr(object, "log2") = log2
+  attr(object, "is_log_trans") <- is_log_trans
   class(object) <- c("S3ProteomicsExperiment", "data.frame")
   object
 }
@@ -230,9 +230,9 @@ Now, we write a `normalize` method for our class. Since `normalize` is not alrea
 normalize <- function(object, ...) UseMethod("normalize")
 
 normalize.S3ProteomicsExperiment <- function(object, by, ...) {
-  if ( !attr(object, "log2") ) {
+  if ( !attr(object, "is_log_trans") ) {
     object$intensity <- log2(object$intensity)
-    attr(object, "log2") <- TRUE
+    attr(object, "is_log_trans") <- TRUE
   }
   std <- object$label == by
   medians <- tapply(object$intensity[std], object$run[std],
@@ -247,7 +247,7 @@ Now we write methods for `summary` and `plot`:
 
 ```{r}
 summary.S3ProteomicsExperiment <- function(object, ...) {
-  if ( attr(object, "log2") )
+  if ( attr(object, "is_log_trans") )
     object$intensity <- 2^object$intensity
   tapply(object$intensity,
          list(run=object$run,
@@ -257,7 +257,7 @@ summary.S3ProteomicsExperiment <- function(object, ...) {
 }
 
 plot.S3ProteomicsExperiment <- function(x, y, ...) {
-  if ( attr(x, "log2") ) {
+  if ( attr(x, "is_log_trans") ) {
     ylab <- "log2(intensity)"
   } else {
     ylab <- "intensity"
@@ -282,7 +282,7 @@ S4 classes are defined by the `setClass` function. They have named `slots` of sp
 
 Class definitions can be examined with the `getClass` function.
 
-Although `data.frame` is an S3 class, the `methods` package also provides an S4 version of many S3 classes, including `data.frame`.
+Although `data.frame` is an S3 class, the __methods__ package also provides an S4 version of many S3 classes, including `data.frame`.
 
 ```{r}
 getClass("data.frame")
@@ -305,7 +305,7 @@ Let's define an S4 class called `S4ProteomicsExperiment` that inherits from `dat
 ```{r}
 setClass("S4ProteomicsExperiment",
          contains="data.frame",
-         slots=c(log2 = "logical",
+         slots=c(is_log_trans = "logical",
                  title = "character"),
          validity=function(object) {
            reqCols <- c("protein", "feature",
@@ -328,7 +328,7 @@ Although S4 objects can be created using the `new` function, it's good form to w
 
 ```{r}
 S4ProteomicsExperiment <- function(protein, feature, run, intensity, label, ..., title="My First Proteomics Experiment",
-                                   log2 = FALSE)
+                                   is_log_trans = FALSE)
 {
   dots <- list(...)
   if ( length(dots) > 0 ) {
@@ -338,7 +338,8 @@ S4ProteomicsExperiment <- function(protein, feature, run, intensity, label, ...,
     object <- data.frame(protein=protein, feature=feature,
          run=run, intensity=intensity, label=label) 
   }
-  new("S4ProteomicsExperiment", object, title=title, log2=log2)
+  new("S4ProteomicsExperiment", object,
+      title=title, is_log_trans=is_log_trans)
 }
 ```
 
@@ -408,9 +409,9 @@ Let's define our S4 `normalize`, `summary`, and `plot` methods using `setMethod(
 ```{r}
 setMethod("normalize", "S4ProteomicsExperiment",
           function(object, by, ...) {
-  if ( !object@log2 ) {
+  if ( !object@is_log_trans ) {
     object$intensity <- log2(object$intensity)
-    object@log2 <- TRUE
+    object@is_log_trans <- TRUE
   }
   std <- object$label == by
   medians <- tapply(object$intensity[std], object$run[std],
@@ -423,7 +424,7 @@ setMethod("normalize", "S4ProteomicsExperiment",
 
 setMethod("summary", "S4ProteomicsExperiment",
           function(object, ...) {
-  if ( object@log2 )
+  if ( object@is_log_trans )
     object$intensity <- 2^object$intensity
   tapply(object$intensity,
          list(run=object$run,
@@ -434,7 +435,7 @@ setMethod("summary", "S4ProteomicsExperiment",
 
 setMethod("plot", "S4ProteomicsExperiment",
           function(x, y, ...) {
-  if ( x@log2 ) {
+  if ( x@is_log_trans ) {
     ylab <- "log2(intensity)"
   } else {
     ylab <- "intensity"
