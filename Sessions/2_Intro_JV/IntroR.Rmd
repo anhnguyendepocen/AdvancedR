@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Set up: form pairs with neighbor. Identify quator with pairs next to you.  All assignments are done in pairs. Grading is done in quators.
+Set up: form pairs with neighbor. Identify quatuor with pairs next to you.  All assignments are done in pairs. Grading is done in quatuors.
 
 # Origins
 
@@ -17,7 +17,7 @@ The R programming language has its roots in S, a language created forty years ag
 
 The motivation for S was to simplify the task of calling statistical routines written in FORTRAN (this involved writing code to read in, format and write out the data).
 
-The goal of S was to free users of the drugery of writing that interface code and speed up the data analyst's workflow.  The key linguistic design principle was to design a language that could be extended and that was devoid of arbitary limitations.
+The goal of S was to free users of the drudgery of writing that interface code and speed up the data analyst's workflow.  The key linguistic design principle was to design a language that could be extended and that was devoid of arbitrary limitations.
 
 The S language was such a success that users started writing statistical routines in S.
 
@@ -63,7 +63,15 @@ f(y = 2, x = 1)
 # an expression that yields a function can be called
 ```
 
-**Exercise 1:** write a definition of a function `f` that will return `0`, `-1`, `1`, `1` for the four calls to `f` above and a variable `x` such tgat the last call returns `-1`.
+Some functions have inline syntax, `+` for example does not require parentheses and `if else` is  function which takes two arguments.  The assignment operators are functions `<-` and `[]<-, so are parenthese `(`.  All functions can be redefined.
+
+```{r}
+`+` <- function(a,b) paste(a,b)
+`(` <- function(a) print("(" + a + ")")
+(1 + 1)
+```
+
+**Exercise 1:** write a definition of a function `f` that will return `0`, `-1`, `1`, `1` for the four calls to `f` above and a variable `x` such that the last call returns `-1`.
 
 ```{r, eval=F}
 f <- function(y = 0, x = 0) x - y
@@ -73,7 +81,7 @@ f(x = 1, y = 2)
 f(y = 2, x = 1)
 ```
 
-The optional arguments have somewhat interesting semantics. In a function, any argument occuring after the three dots must be passed by name.  In the function body they can be passed as argument to a further call.
+The optional arguments have somewhat interesting semantics. In a function, any argument occurring after the three dots must be passed by name.  In the function body they can be passed as argument to a further call.
 
 ```{r, eval=F}
 f <- function( x, ..., y) {  # y can only be passed by name
@@ -87,9 +95,45 @@ f(1,2,y=3)
 
 **Exercise 2:** guess what value the call to `f` will return.
 
-The rationale for putting arguments after the three dots is for optional arguments rarely overriden.
+The rationale for having arguments after the three dots is to specify optional arguments rarely overridden.
 
-Function evaluation is complete when the last expression in the body 
+Function evaluation is complete when the last expression in the body is evaluated. The `return()` call can break evaluation in the middle.  The `stop()` call can raise an exception that can only be caught in a `tryCatch()` statement. 
+
+```{r, eval=F}
+f <- function(x,acc) {
+  if (x == 0) tryCatch( stop(simpleException("done")), 
+                        simpleException = function(err) acc)
+  else f(x-1, acc+1) 
+}  
+```
+
+
+**Exercise 3:** what will happen if we evaluate `f(-1)`.
+
+Each call to a function adds the argument to function on a data structure referred to as the *stack*. When a function returns the arguments are removed from the stack.
+
+# Environments
+
+An environment binds names to values. 
+
+```{r}
+e <- new.env()
+e$a <- FALSE
+e$b <- "a"
+e$c <- 2.3
+e$d <- 1:3
+```
+
+![An environent.](http://adv-r.had.co.nz/diagrams/environments.png/bindings.png)
+
+Environments can be chained by assigning to their *parent environment*.  Looking up names using `get("x", env=e)` will find the first binding for `x` in the sequence of environments starting at `e` and following the `parent` chain.
+
+```{r}
+f <- new.env()
+parent.env(f) <- e
+get("c", env=f)
+```
+
 
 
 * Data structures
