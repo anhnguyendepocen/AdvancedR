@@ -43,10 +43,7 @@ knitr::opts_chunk$set(echo = TRUE)
 - Vectorization
 - Subsetting
 
-
 #### Session 2 5:00PM - 6:00PM R Markdown and Github (Sara Taheri) ####
-
-- TODO
 
 #### 6:00PM Adjourn ####
 
@@ -150,8 +147,6 @@ knitr::opts_chunk$set(echo = TRUE)
 - Introduction to S4
 - Example: S4
     + Rewrite a previous example using S4 objects and methods
-- When to use S3 vs. S4?
-- Other alternatives (ReferenceClasses, R6, etc.)
 
 #### 10:30AM - 11:00AM Break
 
@@ -165,15 +160,7 @@ knitr::opts_chunk$set(echo = TRUE)
     + /src
     + /vignettes
     + etc.
-- How to build a package (easily)
-- Useful tools
-    + Roxygen
-    + devtools
-    + etc.
-- Unit tests
-    + RUnit
-    + testthat
-- How to submit packages to Bioconductor/CRAN
+- How to build a package
 
 #### 12:30PM - 1:30PM Lunch
 
@@ -205,9 +192,7 @@ knitr::opts_chunk$set(echo = TRUE)
     + bigmemory
     + ff
     + matter
-    + HDF5, NetCDF, etc.
-- Scalability on multiple machines (no examples)
-    + rhipe, hadoop, etc.
+    + HDF5Array
 - Scaling using C/C++
     + Writing C/C++ with R internals
     + Writing C/C++ with Rcpp

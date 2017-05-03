@@ -214,12 +214,12 @@ twin_dia2 <- twin_dia %>%
   rename(heavy = intensity_h, light = intensity_l) %>% 
   gather(label, intensity, heavy, light)
 
-exp1 <- S3ProteomicsExperiment(protein=twin_dia2$protein,
+twin_dia3 <- S3ProteomicsExperiment(protein=twin_dia2$protein,
                                feature=twin_dia2$feature,
                                run=twin_dia2$run,
                                intensity=twin_dia2$intensity,
                                label=twin_dia2$label)
-head(exp1)
+head(twin_dia3)
 ```
 
 Because `S3ProteomicsExperiment` inherits from `data.frame`, it inherits the `print` method for data.frames.
@@ -269,9 +269,9 @@ plot.S3ProteomicsExperiment <- function(x, y, ...) {
 Now we can do:
 
 ```{r}
-exp1norm <- normalize(exp1, by="heavy")
-head(summary(exp1norm)[,,"light"])
-plot(exp1norm)
+twin_dia3 <- normalize(twin_dia3, by="heavy")
+head(summary(twin_dia3)[,,"light"])
+plot(twin_dia3)
 ```
 
 ## All about S4 classes
@@ -344,13 +344,13 @@ S4ProteomicsExperiment <- function(protein, feature, run, intensity, label, ...,
 ```
 
 ```{r}
-exp2 <- S4ProteomicsExperiment(protein=twin_dia2$protein,
+twin_dia4 <- S4ProteomicsExperiment(protein=twin_dia2$protein,
                                feature=twin_dia2$feature,
                                run=twin_dia2$run,
                                intensity=twin_dia2$intensity,
                                label=twin_dia2$label,
                                title="Twin DIA Experiment")
-head(exp2)
+head(twin_dia4)
 ```
 
 ## All about S4 generic functions
@@ -449,7 +449,7 @@ setMethod("plot", "S4ProteomicsExperiment",
 Now we can do:
 
 ```{r}
-exp2norm <- normalize(exp2, by="heavy")
-head(summary(exp2norm)[,,"light"])
-plot(exp2norm)
+twin_dia4 <- normalize(twin_dia4, by="heavy")
+head(summary(twin_dia4)[,,"light"])
+plot(twin_dia4)
 ```
