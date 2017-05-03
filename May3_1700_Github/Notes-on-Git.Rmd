@@ -40,7 +40,7 @@ What is the solution to avoid these situations?
 
 When you start a Git project on your computer, you are going to store the entire history of the project locally. The storage of your project and its history is called a \textbf{repository}. 
 
-Every time you save your work, Git creates a \textbf{commit}. A commit is a snapshot of all your files at a point in time. If a file has not changed from one commit to the next, Git uses the previously stored file. Commits create links to other commits, forming a graph of your development history . You can revert your code to a previous commit, inspect how files changed from one commit to the next, and review information such as where and when changes were made.\footnote{figure and the paragraph from \textit{https://www.visualstudio.com/learn/what-is-git/}}
+Every time you save your work, you can \textbf{commit} your changes to Git. A commit is a snapshot of all your files at a point in time. If a file has not changed from one commit to the next, Git uses the previously stored file. Commits create links to other commits, forming a graph of your development history . You can revert your code to a previous commit, inspect how files changed from one commit to the next, and review information such as where and when changes were made.\footnote{figure and the paragraph from \textit{https://www.visualstudio.com/learn/what-is-git/}}
 
 ```{r,fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
@@ -56,7 +56,7 @@ img <- readPNG("./fig/commitRedGreen.png")
 grid.raster(img)
 ```
 
-**Github** is a commercial website that lets you store your repository publicly for free. Once you commit something to repository, you can \textbf{push} them to Github. Now everything is updated locally and also on the server. This is useful because if something happens to your computer you will not lose your data.
+**Github** is a remote server where you can save your project and all the history of changes that Git has made for you in your local history. Once you commit something to repository, you can \textbf{push} them to Github. Now everything is updated locally and also on the server. This is useful because if something happens to your computer you will not lose your data.
 
 Pushing the changes to Github has another benefit too. It lets you to work on a project with a team easily. Your teammate make some changes to the project. She commits the changes on her local repository. Then she pushes the changes to Github server. Now you want to work on the project. First you need to \textbf{pull} the new changes from Github and update your project to the latest changes and then start working on it. This solves the problem in situation 3.
 
