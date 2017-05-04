@@ -9,10 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
-#### Session 7 4:15PM - 5:00PM Functional programming (Jan Vitek) ####
-
-- Motivation, showing problem w/ repetitive copy-paste solution (what problem?)
+```
 - Functionals: `lapply` and family
 - Example: better solution to problem using `lapply`
 - More examples:
@@ -24,596 +21,288 @@ knitr::opts_chunk$set(echo = TRUE)
 - Anonymous functions
 - Closures
 - When to use a loop vs. functional
+````
+
+*The material in this lecture is based on Hadley Wickham's Advanced R book.*
 
 
-
-#  R from first principles
-
-The basic building blocks of the language are surprisingly simple and elegant.
-
-## Functions
-
-The building block for creating abstractions in R is the *function declaration*.  These abstractions are used in *function calls*.
-
-```{r, eval=FALSE}
-f <- function( y ) {  y + 1 }
-f( 1 )
-```
-
-Function definitions in R consist of an argument list and a body. The argument list is a sequence of variable names (with optional default values) and possibly one occurrence of the tripe dot symbol (`...`).  The body of the function can be a single expression or a block (`{...}`).
-
-```{r, eval=FALSE}
-# the shortest function in the book
-function() 1    
-# multiple expressions in the body
-function( x ) { y <- x * x;  y + 1 }
-# default values, optional arguments
-function( x = 0, ..., y = 2)   if(length(z <- list(...) == 0)) x * y  else x * y * z[[1]] 
-```
-
-A function call consists of an expression that evaluates to a function followed by a (possibly empty) list of (possible named) arguments.
-
-```{r, eval=FALSE}
-f()
-# the shortest call of them all
-f(1,2)
-# positional calls pass arguments in order
-f(x = 1, y = 2)
-f(y = 2, x = 1)
-# named calls pass argument by name without a prescribed order
-(x[42])(x=1)
-# an expression that yields a function can be called
-```
-
-Some functions have inline syntax, `+` for example does not require parentheses and `if else` is  function which takes two arguments.  The assignment operators are functions `<-` and `[]<-, so are parenthese `(`.  All functions can be redefined.
+Looking back to a previous example.
 
 ```{r}
-`+` <- function(a,b) paste(a,b)
-`(` <- function(a) print("(" + a + ")")
-(1 + 1)
-```
-
-**Exercise 1:** write a definition of a function `f` that will return `0`, `-1`, `1`, `1` for the four calls to `f` above and a variable `x` such that the last call returns `-1`.
-
-
-Let's clean up the environment. 
-
-```{r}
-rm(`+`)
-rm(`(`)
-```
-
-
-```{r, eval=F}
-f <- function(y = 0, x = 0) x - y
-f()
-f(1,2)
-f(x = 1, y = 2)
-f(y = 2, x = 1)
-```
-
-The optional arguments have somewhat interesting semantics. In a function, any argument occurring after the three dots must be passed by name.  In the function body they can be passed as argument to a further call.
-
-```{r, eval=F}
-f <- function( x, ..., y) {  # y can only be passed by name
-   l1 <- c(...)  # the tree dots become an argument list
-   l2 <- c(x,...)
-   l3 <- c(y,...,x)
-   l1[1] + l2[2] + l3[3]
+set.seed(1014)
+df <- data.frame(replicate(6, sample(c(1:10, -99), 6, rep = TRUE)))
+names(df) <- letters[1:6]
+fix_missing <- function(x) {
+  x[x == -99] <- NA
+  x
 }
-f(1,2,y=3)
+df$a <- fix_missing(df$a)
+df$b <- fix_missing(df$b)
+df$c <- fix_missing(df$c)
+df$d <- fix_missing(df$d)
+df$e <- fix_missing(df$e)
+df$f <- fix_missing(df$e)
 ```
 
-**Exercise 2:** guess what value the call to `f` will return.
+`lapply()` takes three inputs: x, a list; f, a function; and ..., other arguments to pass to `f()`. It applies the function to each element of the list and returns a new list. `lapply(x, f, ...)` is equivalent to the following for loop:
 
-The rationale for having arguments after the three dots is to specify optional arguments rarely overridden.
-
-Function evaluation is complete when the last expression in the body is evaluated. The `return()` call can break evaluation in the middle.  The `stop()` call can raise an exception that can only be caught in a `tryCatch()` statement. 
-
-```{r, eval=F}
-f <- function(x,acc) {
-  if (x == 0) tryCatch( stop(simpleException("done")), 
-                        simpleException = function(err) acc)
-  else f(x-1, acc+1) 
-}  
+```
+out <- vector("list", length(x))
+for (i in seq_along(x)) 
+  out[[i]] <- f(x[[i]], ...)
 ```
 
+`lapply()` is called a functional, because it takes a function as an argument. 
 
-**Exercise 3:** what will happen if we evaluate `f(-1)`.
-
-Each call to a function adds the argument to function on a data structure referred to as the *stack*. When a function returns the arguments are removed from the stack.
-
-# Environments
-
-An environment binds names to values. 
+Data frames are lists. We just need to make sure we get back a data frame, not a list. Instead of assigning the results of lapply() to df, we’ll assign them to df[]. R’s usual rules ensure that we get a data frame, not a list. 
 
 ```{r}
-e <- new.env()
-e$a <- FALSE
-e$b <- "a"
-e$c <- 2.3
-e$d <- 1:3
-```
-
-
-Environments can be chained by assigning to their *parent environment*.  Looking up names using `get("x", env=e)` will find the first binding for `x` in the sequence of environments starting at `e` and following the `parent` chain.
-
-
-```{r}
-f <- new.env()
-parent.env(f) <- e
-get("c", env=f)
-```
-
-Environments are used to hold the variables and parameters of a function.  The chaining is used to implement lexical scoping.
-
-```{r}
-f <- function() {
-   x <- 42
-   function() x
+fix_missing <- function(x) {
+  x[x == -99] <- NA
+  x
 }
-x <- -42
+df[] <- lapply(df, fix_missing)
 ```
 
-**Exercise 4:** what will the value of the expression `f()()`?  
+And we can work on portions of the input
 
-Environment are also used to implement the namespaces that are exported by packages.
-
-Consider the `sd` function, it is provided by the `stats` package.
-
-```{r, eval=F}
-environment(sd)
-#> <environment: namespace:stats>
-where("sd")
-#> <environment: package:stats>
+```{r}
+df[1:5] <- lapply(df[1:5], fix_missing)
 ```
 
-The definition of `sd()` uses function `var()`, but if we make our own version of `var()` it doesn't affect `sd()`:
+What if different columns used different codes for missing values? You might be tempted to copy-and-paste:
+
+```{r}
+fix_missing_99 <- function(x) {
+  x[x == -99] <- NA
+  x
+}
+fix_missing_999 <- function(x) {
+  x[x == -999] <- NA
+  x
+}
+fix_missing_9999 <- function(x) {
+  x[x == -999] <- NA
+  x
+}
+```
+
+As before, it’s easy to create bugs. Instead we could use closures, functions that make and return functions. 
+
+```{r}
+missing_fixer <- function(na_value) 
+  function(x) { x[x==na_value]<-NA; x }
+
+fix_missing_99 <- missing_fixer(-99)
+fix_missing_999 <- missing_fixer(-999)
+fix_missing_99(c(-99, -999))
+```
+
+# Functionals
+
+A higher-order function is a function that takes a function as an input or returns a function as output. 
+
+# My first functional: lapply()
+
+lapply rougly works like this:
+
+```{r}
+lapply2 <- function(x, f, ...) {
+  out <- vector("list", length(x))
+  for (i in seq_along(x)) 
+    out[[i]] <- f(x[[i]], ...)
+  out
+}
+```
+
+`lapply()` is a wrapper for a common for loop pattern: create a container for output, apply `f()` to each component of a list, and fill the container with the results.
 
 ```{r,eval=F}
-x <- 1:10
-sd(x)
-## [1] 3.02765
-var <- function(x, na.rm = TRUE) 100
-sd(x)
-## [1] 3.02765
+# Create some random data
+l <- replicate(20, runif(sample(1:10, 1)), simplify = FALSE)
+
+# With a for loop
+out <- vector("list", length(l))
+for (i in seq_along(l)) out[[i]] <- length(l[[i]])
+unlist(out)
+##  [1]  3  9  1  5  6  9 10  3  3  1  8  3  3  4 10  8  6  8  7  3
+
+# With lapply
+unlist(lapply(l, length))
+##  [1]  3  9  1  5  6  9 10  3  3  1  8  3  3  4 10  8  6  8  7  3
 ```
 
-![](http://adv-r.had.co.nz/diagrams/environments.png/namespace.png)
-
-When we type `var` into the console, it’s found first in the global environment. When `sd()` looks for `var()` it finds it first in its namespace environment so never looks in the `globalenv()`.
-
-
-The assignment operator `<-` updates variables in the current environment. If the variable is not present in the current scope, that variable will be created.
-
-```{r,eval=F}
-rm(x)
-x <- 1
-(function(){ x <- x + 1;  x})()
-```
-
-*Exercise 5:* what does the above print and what is the value of `x` in the `globalenv()`.
-
-The super assignment operator `<<-` updates variables defined in the enclosing scope.
-
+`lapply()` is also useful when you want to do something to each column of a data frame:
 
 ```{r}
-rm(x)
-x <- 1
-(function(){ 
-   x <- x + 1
-   x <<- x + 1
-   x})()
+# What class is each column?
+unlist(lapply(mtcars, class))
+# Divide each column by the mean
+mtcars[] <- lapply(mtcars, function(x) x / mean(x))
 ```
 
-*Exercise 6:* what does the above print and what is the value of `x` in the `globalenv()`.
-
-## Data structures
-
-R offers a variety of built-in data structures.
-
-### Base types
-
-The base types include `double`, `integer`, `characater` and `logical`.  Values can be tested as belonging to one of those types.
-
-```{r, eval=F}
-typeof(1)
-## [1] "double"
-typeof(1L)
-## [1] "integer"
-is.numeric(1.1)
-## [1] TRUE
-is.logical(TRUE)
-is.character("Hello")
-```
-Every base type has a sentinel value used to represent missing observations.
-
-```{r,eval=F}
-x <- 1
-x[2] <- NA
-typeof(x[2])
-## "double"
-typeof(NA)
-## logical
-typeof(NA + 1L)
-```
-
-**Exercise 7:** what is the type of expression `NA + 1L`.
-
-In practice, the difference between integers and doubles is one of space, range and accuracy.  Integers are encoded in 32 bits, they can represent values up to 2 billion operations on integers are accurate.  Doubles are floating point values stored in 64 bits which can loose precision in certain situations.
-
-R programs do not manipulate basic types, all operations in R are vectorized.
-
-### Vectors
-
-R provides several kinds of compound data structures commonly referred to as *vectors*.  All operations in R are *vectorized*, this means that they take vectors as arguments and they will operate on the individual values (basic types) of these vectors.
-
-```{r}
-x <- c(1,2,2)
-y <- c(2,2,1)
-( x + y ) * x
-```
-
-All vectors can be accessed used subsetting operators `[` and `[[`, and can be used with functions `typeof()` (to find out what basic type is in the vector),
-`length()` (how many elements are in it), `attributes()` (query the vector's meta data).
-
-#### Atomic vectors
-
-Atomic vectors are homogeneous (possibly multi-dimensional) data structures.
-
-```{r}
-c(1,2,3)
-c("one","two","three")
-```
-
-Element of vectors can be accessed individually.
-
-```{r}
-x <- c(1L, 2L, 3L)
-x[1] <- 45
-x[1]
-```
-
-The operator `[<-` is the assignment function.
-
-A two dimensional atomic vector is called a *matrix* and higher-dimensional vector is called an *array*.
-
-```{r}
-a <- matrix(1:6, ncol = 3, nrow = 2)
-b <- array(1:12, c(2,3,4))
-a
-b
-```
-
-Matrices and array, like vectors, are homogeneous, but it is possible to assign values of different basic types into any one of them. This causes a *coercion* of the entire data structure.
-
-```{r}
-x[[1]] <-1.1
-x
-a[[2,1]] <- "one"
-a
-```
-
-Coercions go from least to most flexible:  logical, integer, double and character.
-
-**Exercise 8:** what should `a[2,1] <- 1` do?
-
-
-R has a powerful set of subsetting operations that apply to all vectors uniformly. R allows, to subset ranges, rows, columns of vectors.
-
-```{r}
-a[1,]
-a[1:2,]
-a[1:2,2:3]
-aa <- as.integer(a)
-dim(aa) <- c(2,3)
-a[1, a[1,] > 1]
-aa[1, aa[1,] > 1]
-```
-
-When using a predicate such as `a[1,] > 1` for subsetting, behind the scenes R generates a vector of logical values. True indicates a position that should be extracted.  So this is:
-
-```{r}
-aa[1,]>1
-```
-
-We can use logical arrays to subset as follows:
-
-```{r}
-aa[1, c(FALSE, TRUE, TRUE)]
-```
-
-Subsetting can be used in assignment operations as well.
-
-```{r}
-a[1:3] <- a[4:6]
-```
-
-
-#### Lists
-
-Lists are heterogeneous vectors. The elements of list can be of any kind, including lists and vectors.
-
-```{r}
-list(1, "hi", c(1,2))
-```
-
-The `typeof()` a list is `list`. You can test for a list with `is.list()` and coerce to a list with `as.list()`. You can turn a list into an atomic vector with `unlist()`. If the elements of a list have different types, `unlist()` will coerce.
-
-### Referential transparency
-
-To facilitate equational reasoning, R attempts to provide *referential transparency* for function calls. Referential transparency means that arguments are not changed by the function being called. So the following function `f(x)` does not modify the vector passed in.
-
-```{r}
-x
-f <- function(x) { x[1] <- 1 }
-f(x)
-x
-```
-
-But then what does it change in the body?
-
-The `pryr` package provides function `object_size` to estimate the size of several data structures.
-
-```{r}
-X <- 1:(10*1000*1000)
-if (!require("pryr",character.only = TRUE)) install.packages("pryr")
-pryr::object_size(X)
-Y <- X
-pryr::object_size(X,Y)
-Y[1] <- 11
-pryr::object_size(X,Y)
-```
-
-**Exercise 9:** Explain the two surprising things about the above results.
-
-## Attributes
-
-Any vector in R can have attributes. Attributes are a named `list`. Attributes can be accessed individually with `attr()` or all at once (as a list) with `attributes()`.
-
-```{r}
-y <- 1:10
-attr(y, "my_att") <- "This is a vector"
-```
-
-Attributes can be set and queried.
-
-```{r}
-attr(y, "my_att")
-```
-
-The `str()` function clearly shows that attributes are implemented by a `list`.
-
-```{r}
-str(attributes(y))
-```
-
-Some attributes such as `dim`, `name`, `class` are understood by many R functions.  For instance, setting the `names` attribute allows to name positions in a vector (and row/column in matrices).
-
-```{r}
-x <- c(1,2,3)
-attr(x,"names") <- c("a","b","c")
-x["a"]
-```
-
-## Delayed Evaluation
-
-**Exercise 10:** Consider the following code, what will it print?
-
-```{r}
-print(1)   # outputs "1" on the terminal
-f<-function(a,b) { invisible(0) }  # a helper, nevermind
-f( print(1) , print(2) )   # what would this do in Java or in C
-temp <-print(1);temp2 <- print(2); f(temp, temp2)  # same thing?
-```
-
-**Exercise 11:** What will this print?
-
-```{r}
-f1 <- function( a, b, c ) { # Consider the following, not very useful function
- x <- f(b,b)
- x <- c
- x <- c
- a
-}
-
-f1( print(1), print(2), print(3) ) # What do you recon this will print?
-```
-
-**Exercise 12:** What will this print?
-
-```{r}
-f2 <- function( a, b, c ) { # here is another function
-  x <- b
-  x <- c
-  f3(a)
-}
-
-f3 <- function( a) { } # with a silly helper function
-
-f2( print(1), print(2), print(3) ) # what will we print?
-```
-
-In R, arguments to a functions are not evaluated, they are packaged into *promises*. A promise is only evaluated if it is accessed (and only the first time it is accessed).  
-
-Every expression is passed as a promise, except constants.
-
-The following is an obscure corner of R.   Enjoy.
-
-```{r}
-FU <- function(b="") print(paste("FU",b))                # A function
-BAR <- function( FU = print("BAR"))  FU("bar")   # Another function with a default argument
-BAR()   # call bar will print ?
-BAR( function(n) print("YO") )  # and now?
-```
-
-
-# Building Abstractions
-
-We have now reviewed the basic building blocks of the language. Using these building blocks it is possible to construct powerful abstractions.
-
-## Building a factor abstraction
-
-First, lets look at how to implement factors using attributes.
+There are three basic ways to use lapply():
+
+ * `lapply(xs, function(x) {})`
+ * `lapply(seq_along(xs), function(i) {})` 
+ * `lapply(names(xs), function(nm) {})`
  
+Typically you’d use the first form because `lapply()` takes care of saving the output for you.
+
+# Vector output: sapply and vapply
+
+`sapply()` and `vapply()` are similar to `lapply()` but produce an atomic vector. While sapply() guesses, vapply() takes an argument specifying the output type.
+
 ```{r}
-simple_factor <- function (x) {
-    levels <- as.character(unique(x))
-    f <- match(x, levels)
-    attr(f, "levels") <- levels
-    attr(f, "class") <- "simple_factor"
-    f
+sapply(mtcars, is.numeric)
+##  mpg  cyl disp   hp drat   wt qsec   vs   am gear carb 
+## TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+vapply(mtcars, is.numeric, logical(1))
+##  mpg  cyl disp   hp drat   wt qsec   vs   am gear carb 
+## TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+```
+
+If the function returns results of different types or lengths, `sapply()` will silently return a list, while `vapply()` will throw an error. 
+
+# Multiple inputs: Map (and mapply)
+
+With `lapply()`, only one argument to the function varies. This makes it poorly suited for some problems. For example, how would you find a weighted mean when you have two lists, one of observations and the other of weights?
+
+```{r}
+# Generate some sample data
+xs <- replicate(5, runif(10), simplify = FALSE)
+ws <- replicate(5, rpois(10, 5) + 1, simplify = FALSE)
+```
+
+It’s easy to use `lapply()` to compute the unweighted means:
+
+```{r}
+unlist(lapply(xs, mean))
+## [1] 0.5001362 0.5957105 0.5971894 0.5381643 0.5704373
+```
+
+But how could we supply the weights to `weighted.mean()`? `lapply(x, means, w)` won’t work because the additional arguments to `lapply()` are passed to every call. We could change looping forms:
+
+```{r}
+unlist(lapply(seq_along(xs), function(i) {
+  weighted.mean(xs[[i]], ws[[i]])
+}))
+## [1] 0.5096482 0.5621915 0.5599182 0.4842896 0.5773232
+```
+
+A cleaner alternative is to use Map:
+
+```{r}
+unlist(Map(weighted.mean, xs, ws))
+## [1] 0.5096482 0.5621915 0.5599182 0.4842896 0.5773232
+```
+
+This is equivalent to:
+
+```{r}
+stopifnot(length(xs) == length(ws))
+out <- vector("list", length(xs))
+for (i in seq_along(xs)) {
+  out[[i]] <- weighted.mean(xs[[i]], ws[[i]])
 }
-
-x <- c(42, 42, 2, 3, 4)
-simple_factor(x)
 ```
-Printing is not very elegant. Let's add a dedicated print function.
+
+
+Map is useful whenever you have multiple lists/df to process in parallel. E.g. to standardise columns one can compute the means and then divide by them. 
 
 ```{r}
-print.simple_factor <-  function (x, ...)  {
-   xx <- x  # copy x
-   class(xx) <- NULL  # delete its class
-   levels(xx) <- NULL # delete its levels
-   xx <- sapply(xx, function(y) attr(x,"levels")[y]) # replace levels with their values
-   print(xx, quote=FALSE)   # print without quotes
-   cat(paste("Levels: ", paste(levels(x),collapse=" ")))  #print the levels
-  invisible(x)  # return x without echoing it
+mtmeans <- lapply(mtcars, mean)
+mtmeans[] <- Map(`/`, mtcars, mtmeans)
+```
+
+If some of the arguments should be fixed (e.g. na.rm), use an anonymous function:
+
+```
+Map(function(x, w) weighted.mean(x, w, na.rm = TRUE), xs, ws)
+```
+ 
+# Manipulating lists
+
+Another way of thinking about functionals is as a set of general tools for altering, subsetting, and collapsing lists. Every functional programming language has three tools for this: `Map()`, `Reduce()`, and `Filter()`. 
+
+## Reduce()
+
+`Reduce()` reduces a vector to a scalar by recursively calling a function, f, two arguments at a time. It combines the first two elements with f, then combines the result of that call with the third element, and so on. `Reduce(f, 1:3) == f(f(1, 2), 3)`. 
+
+```{r}
+Reduce(`+`, 1:3) # -> ((1 + 2) + 3)
+Reduce(sum, 1:3) # -> sum(sum(1, 2), 3)
+```
+
+The essence of `Reduce()` is:
+
+```
+Reduce2 <- function(f, x) {
+  out <- x[[1]]
+  for(i in seq(2, length(x)))
+    out <- f(out, x[[i]])
+  out
 }
-
-print(simple_factor(x))
 ```
 
-## Building a counter abstraction
+`Reduce()` is useful for implementing many types of recursive operations, like merges and intersections. Imagine you have a list of numeric vectors, and you want to find the values that occur in every element:
 
-With referential transparency it is difficult to mutate non-local state.  What if we wanted to create a large number of counters and did not want anyone but us to be able to update them.
+```{r}
+l <- replicate(5, sample(1:10, 15, replace = T), simplify = FALSE)
+str(l)
+## List of 5
+##  $ : int [1:15] 3 5 4 7 8 1 10 2 10 3 ...
+##  $ : int [1:15] 9 4 9 6 4 9 4 3 3 8 ...
+##  $ : int [1:15] 6 4 4 9 7 6 9 4 9 7 ...
+##  $ : int [1:15] 5 5 8 5 7 4 7 7 1 10 ...
+##  $ : int [1:15] 2 10 9 7 5 1 4 6 6 3 ...
+```
+
+You could do that by intersecting each element in turn:
+
+```{r}
+intersect(intersect(intersect(intersect(l[[1]], l[[2]]),
+  l[[3]]), l[[4]]), l[[5]])
+## [1] 3 4 7 8
+```
+That’s hard to read. With `Reduce()`, the equivalent is:
+
+```{r}
+Reduce(intersect, l)
+## [1] 3 4 7 8
+```
+
+## Predicate functionals
+
+A predicate is a function that returns a single TRUE or FALSE, like `is.character`, `all`, or `is.NULL`. A predicate functional applies a predicate to each element of a list or data frame. There are three useful predicate functionals in base R: `Filter()`, `Find()`, and `Position()`.
+
+`Filter()` selects only those elements which match the predicate.
+
+`Find()` returns the first element which matches the predicate.
+
+`Position()` returns the position of the first element that matches the predicate.
+
+Another useful predicate functional is `where()`, a custom functional that generates a logical vector from a list and a predicate:
+
+```{r}
+where <- function(f, x) 
+  vapply(x, f, logical(1))
+```
 
 
 
 ```{r}
-remove(xPriv)
-counter <- function() { xPriv <- xPriv + 1; xPriv}
-#counter()             # oops, we need to define x
-xPriv<-0
-counter()
-counter()             # Hmm... not quite
-
-# Super assignment to the rescue
-counter <- function() { xPriv <<- xPriv + 1; xPriv}  # <<- assigns in the parent env
-counter()
-counter()             # now we have a counter
+df <- data.frame(x = 1:3, y = c("a", "b", "c"))
+where(is.factor, df)
+##     x     y 
+## FALSE  TRUE
+str(Filter(is.factor, df))
+## 'data.frame':    3 obs. of  1 variable:
+##  $ y: Factor w/ 3 levels "a","b","c": 1 2 3
+str(Find(is.factor, df))
+##  Factor w/ 3 levels "a","b","c": 1 2 3
+Position(is.factor, df)
+## [1] 2
 ```
 
-This only lets us have a single counter. What if we want a counter factory?
 
-
-```{r}
-mkC <- function () { 
-    xPriv <- 0
-    function() { xPriv <<- xPriv + 1; xPriv }
-  }
-
-count <- mkC()
-count()
-count()
-```
-
-The above uses the environment of the `mkC()` function to store the counter. Each time we call `mkC`, a new environment is created.
-
-
-## Building abstractions with Objects
-
-R has multiple object systems. They are constructed on top of attributes and reflective method invocation.
-
-The S3 system gives us single dispatch and simple structures.
-
-
-```{r}
-x<- 1
-attr(x, "class" ) <- "pen"      # class is just an attribute like any other
-x
-y<- 1
-class(y ) <- "cowboy"           # there is a dedicate function to set
-y
-class(y) <- c("cow?cboy","human") # one can be several things
-
-draw <- function( this )  UseMethod("draw", this)  # this introduces the generic method
-draw.cowboy <- function(this)  "Bang"      # different variants for different classes
-draw.pen <- function(this) "Scribble"
-draw.default <- function(this) "Huh?"     # default version when nothing else applies
-
-draw(x)
-draw(y)
-draw(1)
-```
-
-The S4 system is much richer.
-
-```{r}
-setClass("Person",   # Create an new class with two slots
-      slots = list(name = "character", age = "numeric"))
-
-setClass("Employee",  # Extends the Person class with another class
-      slots = list(boss = "Person"), 
-      contains = "Person") # declare an inheritance relationship
-
-# create a few people
-alice <- new("Person", name = "Alice", age = 40)
-john <- new("Employee", name = "John", age = 20, boss = alice) # john's got a boss
-jack <- new("Person", name = "Jack", age = 42)
-
-alice@age              # ask an impolite question
-slot(john, "boss")     # same
-
-# Let's define methods
-setGeneric("hire",  function(x,y) standardGeneric("hire") )
-# The first will work only for persons hiring employees
-setMethod("hire", 
-       c(x = "Person", y = "Employee"), 
-       function(x, y) {
-         print(paste(x@name," hired ",y@name)) 
-         return(setBoss(y)<-x)  # change the boss slot
-       }
-)
-
-# another method for setting fields
-setGeneric("setBoss<-",function(object,value){standardGeneric("setBoss<-")})
-setReplaceMethod(f="setBoss",
-              signature="Employee",
-              definition=function(object,value) return(object@boss <-value)
-              )
-
-hire(alice, john)   # this should work
-
-print(hire(jack, john))  # and this too, changing the boss
-
-hire(john, john)  # this should work as an employee is person
-#hire(alice, alice) # this should fails as an employee isn't a person
-```
-
-## Build abstraction with domain specific languages
-
-R allows to leverage delayed evaluation in order to implement domain specific languages.
-
-Here is the example of timer function that repeatedly run the expression passed in as argument and reports the timing of that expression.
-
-```{r}
-tm <- function( exp ) {
- x<- deparse(substitute( exp ))   ## decompile the expression
- t <- 1                           ## repetion counter (we run exp 10 * t)
- time = 0;                        ## reset timer
- while ( time < 1 ) {             ## continue looking until the code runs long enough
-  y <- x                          ## code
-  for( i in 1:9 ) y <- paste(y,";",x)  ## duplicate the code 10 times
-  y<- paste(" system.time ( for (i in 1:",t,") {", 
-            y,                    ## wrap the code with a loop that runs t times
-            "}, gcFirst= FALSE)")
-  r <- eval(parse(text=y))        ## execute
-  time <- r[3]                    ## grab the elasped time
-  t <- t * 10                     ## try with a bigger t
- }
- (time / (t * 10)) * 1000         ## return time in milliseconds (default is in s)
-}
-
-tm(1 + 1)
-```

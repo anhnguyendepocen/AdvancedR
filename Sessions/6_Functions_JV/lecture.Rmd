@@ -9,7 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
+```{echo=F}
+Learning goals
 - Basics: what is a function and why would you write one?
 - How to write a function
 - Parts of a function
@@ -17,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE)
     + Body
     + Environment
 - Example: writing a function
-    + Rewrite a previous example (from case study?) as a function
+    + Rewrite a previous example as a function
 - Function arguments
     + Default and missing arguments
     + Lazy evaluation
@@ -28,7 +29,57 @@ knitr::opts_chunk$set(echo = TRUE)
 - Example: `+` and `-`, etc., are also functions, can be redefined
 - Infix functions, creating a user-defined `%plus%`, etc.
 - How to write good functions
+```
 
+Code often grows organically without structure or discipline. Code often is the result of a sequence of cut-and-paste-with-replacement operations.
+
+```{r}
+x = matrix(1:9, nrow=3,ncol=3)
+r = 0
+r[1] = 100 + x[1,1] * 2 + x[1,2] / 2 + x[1,3] / 4
+r[1] = r[1]*r[1]
+if (is.na(x[2,3]) == FALSE) {
+  r[2] =  x[2,1] * 2 + x[2,2] / 2 + x[2,3] / 4 + 100
+} else {
+  r[2] = NA
+}
+r[3] = x[3,1] * 2 + x[3,2] / 2 + x[3,3] / 4 
+r[3] = r[3]*r[3]
+r[2] = r[2]* r[2]
+r[3] = as.integer(r[3])
+r[2] = as.integer(r[2])
+r[1] = as.integer(r[1])
+```
+  
+
+*Exercise* assume that the above code was something that needed to be reused. Design a functional abstraction to encapsulate it cleanly.
+
+
+Laws:
+  
+  - code is read more often than written: optimize for the readers
+
+  - avoid repetition: if two code snippets do the same thing, turn them into a function
+  
+  - untested code is wrong code
+  
+   - do not repeat yourself or DRY, principle.   -- from "pragmatic programmers", Dave Thomas and Andy Hunt:
+       "every piece of knowledge must have a single, unambiguous, authoritative representation within a system"
+  
+
+```{r}
+set.seed(1014)
+df <- data.frame(replicate(6, sample(c(1:10, -99), 6, rep = TRUE)))
+names(df) <- letters[1:6]
+df$a[df$a == -99] <- NA
+df$b[df$b == -99] <- NA
+df$c[df$c == -98] <- NA
+df$d[df$d == -99] <- NA
+df$e[df$e == -99] <- NA
+df$f[df$g == -99] <- NA
+```
+
+*Exercise* rewrite the above with a function to replace the missings.
 
 
 ## Functions
@@ -55,35 +106,37 @@ function( x = 0, ..., y = 2)   if(length(z <- list(...) == 0)) x * y  else x * y
 
 A function call consists of an expression that evaluates to a function followed by a (possibly empty) list of (possible named) arguments.
 
+Functions can be stored in lists, e.g. `list(f)`.
+
 ```{r, eval=FALSE}
 f()
 # the shortest call of them all
 f(1,2)
 # positional calls pass arguments in order
-f(x = 1, y = 2)
+f(x = 1, y = 2)x`
 f(y = 2, x = 1)
 # named calls pass argument by name without a prescribed order
 (x[42])(x=1)
 # an expression that yields a function can be called
 ```
 
+**Exercise** write a definition of a function `f` that will return `0`, `-1`, `1`, `1` for the four calls to `f` above and a variable `x` such that the last call returns `-1`.
+
+
+
 Some functions have inline syntax, `+` for example does not require parentheses and `if else` is  function which takes two arguments.  The assignment operators are functions `<-` and `[]<-, so are parenthese `(`.  All functions can be redefined.
 
-```{r}
-`+` <- function(a,b) paste(a,b)
-`(` <- function(a) print("(" + a + ")")
-(1 + 1)
-```
 
-**Exercise 1:** write a definition of a function `f` that will return `0`, `-1`, `1`, `1` for the four calls to `f` above and a variable `x` such that the last call returns `-1`.
-
-
-Let's clean up the environment. 
+To define an inline operator, one can either redefine an existing operator like `+` or use the syntax `%+%` to define a new operator.
 
 ```{r}
-rm(`+`)
-rm(`(`)
+"%+%" <- function(a,b) paste(a,b)
+
+"hi" %+% "ho"
 ```
+
+This allows users to extend the set of operators but with the risk of collisions.
+
 
 
 ```{r, eval=F}
@@ -96,20 +149,6 @@ f(y = 2, x = 1)
 
 The optional arguments have somewhat interesting semantics. In a function, any argument occurring after the three dots must be passed by name.  In the function body they can be passed as argument to a further call.
 
-```{r, eval=F}
-f <- function( x, ..., y) {  # y can only be passed by name
-   l1 <- c(...)  # the tree dots become an argument list
-   l2 <- c(x,...)
-   l3 <- c(y,...,x)
-   l1[1] + l2[2] + l3[3]
-}
-f(1,2,y=3)
-```
-
-**Exercise 2:** guess what value the call to `f` will return.
-
-The rationale for having arguments after the three dots is to specify optional arguments rarely overridden.
-
 Function evaluation is complete when the last expression in the body is evaluated. The `return()` call can break evaluation in the middle.  The `stop()` call can raise an exception that can only be caught in a `tryCatch()` statement. 
 
 ```{r, eval=F}
@@ -121,10 +160,7 @@ f <- function(x,acc) {
 ```
 
 
-**Exercise 3:** what will happen if we evaluate `f(-1)`.
-
 Each call to a function adds the argument to function on a data structure referred to as the *stack*. When a function returns the arguments are removed from the stack.
-
 
 ### Referential transparency
 
@@ -139,24 +175,12 @@ x
 
 But then what does it change in the body?
 
-The `pryr` package provides function `object_size` to estimate the size of several data structures.
-
-```{r}
-X <- 1:(10*1000*1000)
-if (!require("pryr",character.only = TRUE)) install.packages("pryr")
-pryr::object_size(X)
-Y <- X
-pryr::object_size(X,Y)
-Y[1] <- 11
-pryr::object_size(X,Y)
-```
-
-**Exercise 9:** Explain the two surprising things about the above results.
+What are the statements that cause this happen?
 
 
 ## Delayed Evaluation
 
-**Exercise 10:** Consider the following code, what will it print?
+**Exercise** Consider the following code, what will it print?
 
 ```{r}
 print(1)   # outputs "1" on the terminal
@@ -165,7 +189,7 @@ f( print(1) , print(2) )   # what would this do in Java or in C
 temp <-print(1);temp2 <- print(2); f(temp, temp2)  # same thing?
 ```
 
-**Exercise 11:** What will this print?
+**Exercise** What will this print?
 
 ```{r}
 f1 <- function( a, b, c ) { # Consider the following, not very useful function
@@ -178,7 +202,7 @@ f1 <- function( a, b, c ) { # Consider the following, not very useful function
 f1( print(1), print(2), print(3) ) # What do you recon this will print?
 ```
 
-**Exercise 12:** What will this print?
+**Exercise** What will this print?
 
 ```{r}
 f2 <- function( a, b, c ) { # here is another function
@@ -205,42 +229,6 @@ BAR()   # call bar will print ?
 BAR( function(n) print("YO") )  # and now?
 ```
 
-
-# Building Abstractions
-
-We have now reviewed the basic building blocks of the language. Using these building blocks it is possible to construct powerful abstractions.
-
-## Building a factor abstraction
-
-First, lets look at how to implement factors using attributes.
- 
-```{r}
-simple_factor <- function (x) {
-    levels <- as.character(unique(x))
-    f <- match(x, levels)
-    attr(f, "levels") <- levels
-    attr(f, "class") <- "simple_factor"
-    f
-}
-
-x <- c(42, 42, 2, 3, 4)
-simple_factor(x)
-```
-Printing is not very elegant. Let's add a dedicated print function.
-
-```{r}
-print.simple_factor <-  function (x, ...)  {
-   xx <- x  # copy x
-   class(xx) <- NULL  # delete its class
-   levels(xx) <- NULL # delete its levels
-   xx <- sapply(xx, function(y) attr(x,"levels")[y]) # replace levels with their values
-   print(xx, quote=FALSE)   # print without quotes
-   cat(paste("Levels: ", paste(levels(x),collapse=" ")))  #print the levels
-  invisible(x)  # return x without echoing it
-}
-
-print(simple_factor(x))
-```
 
 ## Building a counter abstraction
 
@@ -291,17 +279,12 @@ tm <- function( exp ) {
  t <- 1                           ## repetion counter (we run exp 10 * t)
  time = 0;                        ## reset timer
  while ( time < 1 ) {             ## continue looking until the code runs long enough
-  y <- x                          ## code
-  for( i in 1:9 ) y <- paste(y,";",x)  ## duplicate the code 10 times
-  y<- paste(" system.time ( for (i in 1:",t,") {", 
-            y,                    ## wrap the code with a loop that runs t times
-            "}, gcFirst= FALSE)")
+  y<- paste(" system.time(for(i in 1:",t,"){",x,"})")
   r <- eval(parse(text=y))        ## execute
   time <- r[3]                    ## grab the elasped time
   t <- t * 10                     ## try with a bigger t
  }
- (time / (t * 10)) * 1000         ## return time in milliseconds (default is in s)
+ (time / t) * 1000                ## return time in milliseconds (default is in s)
 }
-
 tm(1 + 1)
 ```
