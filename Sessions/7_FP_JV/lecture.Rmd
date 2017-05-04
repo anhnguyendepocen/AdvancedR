@@ -1,5 +1,5 @@
 ---
-title: "A Tour of (advanced) R in Sixty Minutes"
+title: "Functional Programming"
 author: "Jan Vitek"
 date: "Wednesday May 3, 2017"
 output: html_document
@@ -9,35 +9,22 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-"Any sufficiently advanced technology is indistinguishable from magic." -- Arthur C. Clarke
 
-This lecture should be interactive; participants should form pairs for solving the exercises. 
+#### Session 7 4:15PM - 5:00PM Functional programming (Jan Vitek) ####
 
-The learning goal is to arrive at a mental model of how R programs are evaluated and a better understanding how abstractions can be implemented.
+- Motivation, showing problem w/ repetitive copy-paste solution (what problem?)
+- Functionals: `lapply` and family
+- Example: better solution to problem using `lapply`
+- More examples:
+    + `sapply`
+    + `tapply`
+    + `vapply`
+    + `apply`
+    + etc.
+- Anonymous functions
+- Closures
+- When to use a loop vs. functional
 
-# Origins
-
-The R programming language has its roots in S, a language created forty years ago at ATT Bell Labs by Chambers, Becker and Wilks.
-
-The motivation for S was to simplify the task of calling statistical routines written in FORTRAN (this involved writing code to read in, format and write out the data).
-
-The goal of S was to free users of the drudgery of writing that interface code and speed up the data analyst's workflow.  The key linguistic design principle was to design a language that could be extended and that was devoid of arbitrary limitations.
-
-The S language was such a success that users started writing statistical routines in S.
-
-The R programming language was designed by Ross Ihaka and Robert Gentleman at the University of Auckland around 1992.  
-
-R departed from S in number of ways, it was an open source language released under a GPL license to ensure that everything related to R remains in the public domain, R cleaned up some corners of S and improve the performance of programs written in the language.
-
-# Status
-
-R is growing in [popularity](https://www.r-bloggers.com/r-moves-up-to-5th-place-in-ieee-language-rankings) thanks to its rich ecosystem.  The IEEE ranks R as the fifth most popular language:
-
-*"Another language that has continued to move up the rankings since '14 is R, now in fifth place. R has been lifted in our rankings by racking up more questions on Stack Overflow—about 46% more since 2014. But even more important to R’s rise is that it is increasingly mentioned in scholarly research papers. [...] In our '15 ranking there were a mere 39 papers talking about the language, whereas this year we logged 244 papers."*
-
-While the RedMonk language rating puts it in 12th place:
-
-*"... R has shown the most consistent upwards movement over time. From its position of 17 in '12, it has made steady gains over time ... R took over #12 from Perl which in turn dropped to #13. There’s still an enormous amount of Perl in circulation, but the fact that the more specialized R has unseated the language once considered the glue of the web says as much about Perl as it does about R."*
 
 
 #  R from first principles
@@ -74,8 +61,7 @@ f(1,2)
 f(x = 1, y = 2)
 f(y = 2, x = 1)
 # named calls pass argument by name without a prescribed order
-x <- list(f,f)
-(x[2])(x=1)
+(x[42])(x=1)
 # an expression that yields a function can be called
 ```
 
@@ -149,7 +135,6 @@ e$c <- 2.3
 e$d <- 1:3
 ```
 
-![An environment refers to values in memory.](http://adv-r.had.co.nz/diagrams/environments.png/bindings.png)
 
 Environments can be chained by assigning to their *parent environment*.  Looking up names using `get("x", env=e)` will find the first binding for `x` in the sequence of environments starting at `e` and following the `parent` chain.
 
