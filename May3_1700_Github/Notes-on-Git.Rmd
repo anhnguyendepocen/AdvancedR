@@ -2,7 +2,8 @@
 title: "Notes on how to use Git"
 author: "Sara Taheri"
 date: "August 14, 2016"
-output: pdf_document
+output:
+  pdf_document: default
 fig_caption: yes
 ---
 
@@ -39,29 +40,29 @@ What is the solution to avoid these situations?
 
 When you start a Git project on your computer, you are going to store the entire history of the project locally. The storage of your project and its history is called a \textbf{repository}. 
 
-Every time you save your work, Git creates a \textbf{commit}. A commit is a snapshot of all your files at a point in time. If a file has not changed from one commit to the next, Git uses the previously stored file. Commits create links to other commits, forming a graph of your development history . You can revert your code to a previous commit, inspect how files changed from one commit to the next, and review information such as where and when changes were made.\footnote{figure and the paragraph from \textit{https://www.visualstudio.com/learn/what-is-git/}}
+Every time you save your work, you can \textbf{commit} your changes to Git. A commit is a snapshot of all your files at a point in time. If a file has not changed from one commit to the next, Git uses the previously stored file. Commits create links to other commits, forming a graph of your development history . You can revert your code to a previous commit, inspect how files changed from one commit to the next, and review information such as where and when changes were made.\footnote{figure and the paragraph from \textit{https://www.visualstudio.com/learn/what-is-git/}}
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r,fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/commit_chain.png")
 grid.raster(img)
 ```
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center',fig.cap="The red line is the line that was deleted and the green lines are the ones that are added to the file."}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center',fig.cap="The red line is the line that was deleted and the green lines are the ones that are added to the file."}
 library(png)
 library(grid)
 img <- readPNG("./fig/commitRedGreen.png")
 grid.raster(img)
 ```
 
-**Github** is a commercial website that lets you store your repository publicly for free. Once you commit something to repository, you can \textbf{push} them to Github. Now everything is updated locally and also on the server. This is useful because if something happens to your computer you will not lose your data.
+**Github** is a remote server where you can save your project and all the history of changes that Git has made for you in your local history. Once you commit something to repository, you can \textbf{push} them to Github. Now everything is updated locally and also on the server. This is useful because if something happens to your computer you will not lose your data.
 
 Pushing the changes to Github has another benefit too. It lets you to work on a project with a team easily. Your teammate make some changes to the project. She commits the changes on her local repository. Then she pushes the changes to Github server. Now you want to work on the project. First you need to \textbf{pull} the new changes from Github and update your project to the latest changes and then start working on it. This solves the problem in situation 3.
 
 Each time someone wants to work on the project has to pull first, then edit the file, commit his changes and push them to server.
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/pushpullRepository.png")
@@ -69,7 +70,7 @@ grid.raster(img)
 ```
 (From https://github.com/Rafase282/My-FreeCodeCamp-Code/wiki/Lesson-Save-your-Code-Revisions-Forever-with-Git)
 
-Now let's see what we learned so far in practice.
+Now let's see what we have learned so far in practice.
 
 ## Install and set up Git 
 
@@ -99,7 +100,7 @@ img <- readPNG("./fig/creatRepository.png")
 grid.raster(img)
 ```
 
-```{r, fig.height=4, fig.width=4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width=5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/creatRepository1.png")
@@ -170,7 +171,7 @@ img <- readPNG("./fig/README.png")
 grid.raster(img)
 ```
 
-```{r, fig.height=6, fig.width = 6, echo=FALSE,fig.align='center'}
+```{r, fig.height=7, fig.width = 6, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/changeReadMe.png")
@@ -184,7 +185,7 @@ img <- readPNG("./fig/commitIcon.png")
 grid.raster(img)
 ```
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/firstCommit.png")
@@ -205,14 +206,14 @@ img <- readPNG("./fig/pushBranchWindow.png")
 grid.raster(img)
 ```
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/first_commit.png")
 grid.raster(img)
 ```
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/changes_in_README.png")
@@ -296,7 +297,7 @@ img <- readPNG("./fig/second_commit.png")
 grid.raster(img)
 ```
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/changes_push_github_server.png")
@@ -318,21 +319,21 @@ read [this](https://www.r-bloggers.com/version-control-with-git/) and [this](htt
 - Click on "Add collaborator".
 - An invitation will be emailed to your collaborator. Ask him/her to check his/her inbox and accept the invitation.
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/new_collaborator_setting.png")
 grid.raster(img)
 ```
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/options_collaborators.png")
 grid.raster(img)
 ```
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/collaborator_name.png")
@@ -381,21 +382,21 @@ some codes
 
 lines between these signs are the source of conflict. You can decide whether to keep the both lines or to delete one of them. Then you should delete all those signs and commit that you have solved the conflicts and then push it to server.
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/click_on_my_codes.png")
 grid.raster(img)
 ```
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/edit_this_file.png")
 grid.raster(img)
 ```
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/comit_changes.png")
@@ -423,7 +424,7 @@ img <- readPNG("./fig/pull_error.png")
 grid.raster(img)
 ```
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/commit_conflict.png")
@@ -444,7 +445,7 @@ img <- readPNG("./fig/commit_after_conflict.png")
 grid.raster(img)
 ```
 
-```{r, fig.height=4, fig.width = 4, echo=FALSE,fig.align='center'}
+```{r, fig.height=5, fig.width = 5, echo=FALSE,fig.align='center'}
 library(png)
 library(grid)
 img <- readPNG("./fig/conflict_solved_commit.png")

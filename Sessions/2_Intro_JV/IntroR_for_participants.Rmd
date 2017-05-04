@@ -1,6 +1,6 @@
 ---
 title: "A Tour of (advanced) R in Sixty Minutes"
-author: "Jan Vitek"
+author: "Advanced R"
 date: "Wednesday May 3, 2017"
 output: html_document
 ---
@@ -74,8 +74,7 @@ f(1,2)
 f(x = 1, y = 2)
 f(y = 2, x = 1)
 # named calls pass argument by name without a prescribed order
-x <- list(f,f)
-(x[2])(x=1)
+(x[42])(x=1)
 # an expression that yields a function can be called
 ```
 

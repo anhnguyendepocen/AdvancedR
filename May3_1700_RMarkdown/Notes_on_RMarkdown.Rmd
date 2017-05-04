@@ -2,7 +2,10 @@
 title: "Notes on how to use R Markdown"
 author: "Sara Taheri"
 date: "5/1/2017"
-output: pdf_document
+output:
+  html_document: default
+  pdf_document: default
+fig_caption: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -133,7 +136,7 @@ grid.raster(img)
 
 The result is in figure 1:
 
-```{r pressure1, echo=FALSE, fig.width= 4, fig.height= 4, fig.cap= "This plot shows the relationship between the pressure of a romm and the temperature of it."}
+```{r pressure1, echo=FALSE, fig.width= 4, fig.height= 4, fig.cap= "This plot shows the relationship between the pressure of a room and the temperature of it."}
 plot(x = c(1,2,3,5,3,6), y = c(1,4,2,6,3,5), main = " This is my plot",
      xlab = "pressure", ylab = "temperature")
 ```

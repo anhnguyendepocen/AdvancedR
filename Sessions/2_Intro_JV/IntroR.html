@@ -123,7 +123,9 @@ $(document).ready(function () {
 </div>
 
 
-<p>Set up: form pairs with neighbor. Identify quatuor with pairs next to you. All assignments are done in pairs. Grading is done in quatuors.</p>
+<p>“Any sufficiently advanced technology is indistinguishable from magic.” – Arthur C. Clarke</p>
+<p>This lecture should be interactive; participants should form pairs for solving the exercises.</p>
+<p>The learning goal is to arrive at a mental model of how R programs are evaluated and a better understanding how abstractions can be implemented.</p>
 <div id="origins" class="section level1">
 <h1>Origins</h1>
 <p>The R programming language has its roots in S, a language created forty years ago at ATT Bell Labs by Chambers, Becker and Wilks.</p>
@@ -135,7 +137,10 @@ $(document).ready(function () {
 </div>
 <div id="status" class="section level1">
 <h1>Status</h1>
-<p>TODO - write about how popular / widely used R is today.</p>
+<p>R is growing in <a href="https://www.r-bloggers.com/r-moves-up-to-5th-place-in-ieee-language-rankings">popularity</a> thanks to its rich ecosystem. The IEEE ranks R as the fifth most popular language:</p>
+<p><em>“Another language that has continued to move up the rankings since ’14 is R, now in fifth place. R has been lifted in our rankings by racking up more questions on Stack Overflow—about 46% more since 2014. But even more important to R’s rise is that it is increasingly mentioned in scholarly research papers. […] In our ’15 ranking there were a mere 39 papers talking about the language, whereas this year we logged 244 papers.”</em></p>
+<p>While the RedMonk language rating puts it in 12th place:</p>
+<p><em>“… R has shown the most consistent upwards movement over time. From its position of 17 in ’12, it has made steady gains over time … R took over #12 from Perl which in turn dropped to #13. There’s still an enormous amount of Perl in circulation, but the fact that the more specialized R has unseated the language once considered the glue of the web says as much about Perl as it does about R.”</em></p>
 </div>
 <div id="r-from-first-principles" class="section level1">
 <h1>R from first principles</h1>
@@ -226,7 +231,7 @@ x &lt;- -42</code></pre>
 #&gt; &lt;environment: namespace:stats&gt;
 where(&quot;sd&quot;)
 #&gt; &lt;environment: package:stats&gt;</code></pre>
-<p>The definition of <code>sd()</code> uses funcion <code>var()</code>, but if we make our own version of <code>var()</code> it doesn’t affect <code>sd()</code>:</p>
+<p>The definition of <code>sd()</code> uses function <code>var()</code>, but if we make our own version of <code>var()</code> it doesn’t affect <code>sd()</code>:</p>
 <pre class="r"><code>x &lt;- 1:10
 sd(x)
 ## [1] 3.02765
@@ -238,7 +243,20 @@ sd(x)
 
 </div>
 <p>When we type <code>var</code> into the console, it’s found first in the global environment. When <code>sd()</code> looks for <code>var()</code> it finds it first in its namespace environment so never looks in the <code>globalenv()</code>.</p>
-<p>TODO read/write &lt;- v &lt;&lt;-</p>
+<p>The assignment operator <code>&lt;-</code> updates variables in the current environment. If the variable is not present in the current scope, that variable will be created.</p>
+<pre class="r"><code>rm(x)
+x &lt;- 1
+(function(){ x &lt;- x + 1;  x})()</code></pre>
+<p><em>Exercise 5:</em> what does the above print and what is the value of <code>x</code> in the <code>globalenv()</code>.</p>
+<p>The super assignment operator <code>&lt;&lt;-</code> updates variables defined in the enclosing scope.</p>
+<pre class="r"><code>rm(x)
+x &lt;- 1
+(function(){ 
+   x &lt;- x + 1
+   x &lt;&lt;- x + 1
+   x})()</code></pre>
+<pre><code>## [1] 2</code></pre>
+<p><em>Exercise 6:</em> what does the above print and what is the value of <code>x</code> in the <code>globalenv()</code>.</p>
 <div id="data-structures" class="section level2">
 <h2>Data structures</h2>
 <p>R offers a variety of built-in data structures.</p>
@@ -253,7 +271,7 @@ is.numeric(1.1)
 ## [1] TRUE
 is.logical(TRUE)
 is.character(&quot;Hello&quot;)</code></pre>
-<p>Every base type has a sentinnel value used to represent missing observations.</p>
+<p>Every base type has a sentinel value used to represent missing observations.</p>
 <pre class="r"><code>x &lt;- 1
 x[2] &lt;- NA
 typeof(x[2])
@@ -261,13 +279,13 @@ typeof(x[2])
 typeof(NA)
 ## logical
 typeof(NA + 1L)</code></pre>
-<p><strong>Exercise 5:</strong> what is the type of expression <code>NA + 1L</code>.</p>
+<p><strong>Exercise 7:</strong> what is the type of expression <code>NA + 1L</code>.</p>
 <p>In practice, the difference between integers and doubles is one of space, range and accuracy. Integers are encoded in 32 bits, they can represent values up to 2 billion operations on integers are accurate. Doubles are floating point values stored in 64 bits which can loose precision in certain situations.</p>
 <p>R programs do not manipulate basic types, all operations in R are vectorized.</p>
 </div>
 <div id="vectors" class="section level3">
 <h3>Vectors</h3>
-<p>R provides several kinds of compound data structrures commonly referred to as <em>vectors</em>. All operations in R are <em>vectorized</em>, this means that they take vectors as arguments and they will operate on the individual values (basic types) of these vectors.</p>
+<p>R provides several kinds of compound data structures commonly referred to as <em>vectors</em>. All operations in R are <em>vectorized</em>, this means that they take vectors as arguments and they will operate on the individual values (basic types) of these vectors.</p>
 <pre class="r"><code>x &lt;- c(1,2,2)
 y &lt;- c(2,2,1)
 ( x + y ) * x</code></pre>
@@ -288,18 +306,359 @@ x[1]</code></pre>
 <p>The operator <code>[&lt;-</code> is the assignment function.</p>
 <p>A two dimensional atomic vector is called a <em>matrix</em> and higher-dimensional vector is called an <em>array</em>.</p>
 <pre class="r"><code>a &lt;- matrix(1:6, ncol = 3, nrow = 2)
-b &lt;- array(1:12, c(2,3,4))</code></pre>
+b &lt;- array(1:12, c(2,3,4))
+a</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    3    5
+## [2,]    2    4    6</code></pre>
+<pre class="r"><code>b</code></pre>
+<pre><code>## , , 1
+## 
+##      [,1] [,2] [,3]
+## [1,]    1    3    5
+## [2,]    2    4    6
+## 
+## , , 2
+## 
+##      [,1] [,2] [,3]
+## [1,]    7    9   11
+## [2,]    8   10   12
+## 
+## , , 3
+## 
+##      [,1] [,2] [,3]
+## [1,]    1    3    5
+## [2,]    2    4    6
+## 
+## , , 4
+## 
+##      [,1] [,2] [,3]
+## [1,]    7    9   11
+## [2,]    8   10   12</code></pre>
+<p>Matrices and array, like vectors, are homogeneous, but it is possible to assign values of different basic types into any one of them. This causes a <em>coercion</em> of the entire data structure.</p>
+<pre class="r"><code>x[[1]] &lt;-1.1
+x</code></pre>
+<pre><code>## [1] 1.1 2.0 3.0</code></pre>
+<pre class="r"><code>a[[2,1]] &lt;- &quot;one&quot;
+a</code></pre>
+<pre><code>##      [,1]  [,2] [,3]
+## [1,] &quot;1&quot;   &quot;3&quot;  &quot;5&quot; 
+## [2,] &quot;one&quot; &quot;4&quot;  &quot;6&quot;</code></pre>
+<p>Coercions go from least to most flexible: logical, integer, double and character.</p>
+<p><strong>Exercise 8:</strong> what should <code>a[2,1] &lt;- 1</code> do?</p>
+<p>R has a powerful set of subsetting operations that apply to all vectors uniformly. R allows, to subset ranges, rows, columns of vectors.</p>
+<pre class="r"><code>a[1,]</code></pre>
+<pre><code>## [1] &quot;1&quot; &quot;3&quot; &quot;5&quot;</code></pre>
+<pre class="r"><code>a[1:2,]</code></pre>
+<pre><code>##      [,1]  [,2] [,3]
+## [1,] &quot;1&quot;   &quot;3&quot;  &quot;5&quot; 
+## [2,] &quot;one&quot; &quot;4&quot;  &quot;6&quot;</code></pre>
+<pre class="r"><code>a[1:2,2:3]</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,] &quot;3&quot;  &quot;5&quot; 
+## [2,] &quot;4&quot;  &quot;6&quot;</code></pre>
+<pre class="r"><code>aa &lt;- as.integer(a)</code></pre>
+<pre><code>## Warning: NAs introduced by coercion</code></pre>
+<pre class="r"><code>dim(aa) &lt;- c(2,3)
+a[1, a[1,] &gt; 1]</code></pre>
+<pre><code>## [1] &quot;3&quot; &quot;5&quot;</code></pre>
+<pre class="r"><code>aa[1, aa[1,] &gt; 1]</code></pre>
+<pre><code>## [1] 3 5</code></pre>
+<p>When using a predicate such as <code>a[1,] &gt; 1</code> for subsetting, behind the scenes R generates a vector of logical values. True indicates a position that should be extracted. So this is:</p>
+<pre class="r"><code>aa[1,]&gt;1</code></pre>
+<pre><code>## [1] FALSE  TRUE  TRUE</code></pre>
+<p>We can use logical arrays to subset as follows:</p>
+<pre class="r"><code>aa[1, c(FALSE, TRUE, TRUE)]</code></pre>
+<pre><code>## [1] 3 5</code></pre>
+<p>Subsetting can be used in assignment operations as well.</p>
+<pre class="r"><code>a[1:3] &lt;- a[4:6]</code></pre>
 </div>
 <div id="lists" class="section level4">
 <h4>Lists</h4>
-<ul>
-<li>Subsetting</li>
-<li>Lazy evaluation</li>
-<li>Objects</li>
-<li>Domain specific languages</li>
-</ul>
+<p>Lists are heterogeneous vectors. The elements of list can be of any kind, including lists and vectors.</p>
+<pre class="r"><code>list(1, &quot;hi&quot;, c(1,2))</code></pre>
+<pre><code>## [[1]]
+## [1] 1
+## 
+## [[2]]
+## [1] &quot;hi&quot;
+## 
+## [[3]]
+## [1] 1 2</code></pre>
+<p>The <code>typeof()</code> a list is <code>list</code>. You can test for a list with <code>is.list()</code> and coerce to a list with <code>as.list()</code>. You can turn a list into an atomic vector with <code>unlist()</code>. If the elements of a list have different types, <code>unlist()</code> will coerce.</p>
 </div>
 </div>
+<div id="referential-transparency" class="section level3">
+<h3>Referential transparency</h3>
+<p>To facilitate equational reasoning, R attempts to provide <em>referential transparency</em> for function calls. Referential transparency means that arguments are not changed by the function being called. So the following function <code>f(x)</code> does not modify the vector passed in.</p>
+<pre class="r"><code>x</code></pre>
+<pre><code>## [1] 1.1 2.0 3.0</code></pre>
+<pre class="r"><code>f &lt;- function(x) { x[1] &lt;- 1 }
+f(x)
+x</code></pre>
+<pre><code>## [1] 1.1 2.0 3.0</code></pre>
+<p>But then what does it change in the body?</p>
+<p>The <code>pryr</code> package provides function <code>object_size</code> to estimate the size of several data structures.</p>
+<pre class="r"><code>X &lt;- 1:(10*1000*1000)
+if (!require(&quot;pryr&quot;,character.only = TRUE)) install.packages(&quot;pryr&quot;)</code></pre>
+<pre><code>## Loading required package: pryr</code></pre>
+<pre><code>## 
+## Attaching package: 'pryr'</code></pre>
+<pre><code>## The following object is masked _by_ '.GlobalEnv':
+## 
+##     f</code></pre>
+<pre class="r"><code>pryr::object_size(X)</code></pre>
+<pre><code>## 40 MB</code></pre>
+<pre class="r"><code>Y &lt;- X
+pryr::object_size(X,Y)</code></pre>
+<pre><code>## 40 MB</code></pre>
+<pre class="r"><code>Y[1] &lt;- 11
+pryr::object_size(X,Y)</code></pre>
+<pre><code>## 120 MB</code></pre>
+<p><strong>Exercise 9:</strong> Explain the two surprising things about the above results.</p>
+</div>
+</div>
+<div id="attributes" class="section level2">
+<h2>Attributes</h2>
+<p>Any vector in R can have attributes. Attributes are a named <code>list</code>. Attributes can be accessed individually with <code>attr()</code> or all at once (as a list) with <code>attributes()</code>.</p>
+<pre class="r"><code>y &lt;- 1:10
+attr(y, &quot;my_att&quot;) &lt;- &quot;This is a vector&quot;</code></pre>
+<p>Attributes can be set and queried.</p>
+<pre class="r"><code>attr(y, &quot;my_att&quot;)</code></pre>
+<pre><code>## [1] &quot;This is a vector&quot;</code></pre>
+<p>The <code>str()</code> function clearly shows that attributes are implemented by a <code>list</code>.</p>
+<pre class="r"><code>str(attributes(y))</code></pre>
+<pre><code>## List of 1
+##  $ my_att: chr &quot;This is a vector&quot;</code></pre>
+<p>Some attributes such as <code>dim</code>, <code>name</code>, <code>class</code> are understood by many R functions. For instance, setting the <code>names</code> attribute allows to name positions in a vector (and row/column in matrices).</p>
+<pre class="r"><code>x &lt;- c(1,2,3)
+attr(x,&quot;names&quot;) &lt;- c(&quot;a&quot;,&quot;b&quot;,&quot;c&quot;)
+x[&quot;a&quot;]</code></pre>
+<pre><code>## a 
+## 1</code></pre>
+</div>
+<div id="delayed-evaluation" class="section level2">
+<h2>Delayed Evaluation</h2>
+<p><strong>Exercise 10:</strong> Consider the following code, what will it print?</p>
+<pre class="r"><code>print(1)   # outputs &quot;1&quot; on the terminal</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>f&lt;-function(a,b) { invisible(0) }  # a helper, nevermind
+f( print(1) , print(2) )   # what would this do in Java or in C
+temp &lt;-print(1);temp2 &lt;- print(2); f(temp, temp2)  # same thing?</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre><code>## [1] 2</code></pre>
+<p><strong>Exercise 11:</strong> What will this print?</p>
+<pre class="r"><code>f1 &lt;- function( a, b, c ) { # Consider the following, not very useful function
+ x &lt;- f(b,b)
+ x &lt;- c
+ x &lt;- c
+ a
+}
+
+f1( print(1), print(2), print(3) ) # What do you recon this will print?</code></pre>
+<pre><code>## [1] 3
+## [1] 1</code></pre>
+<p><strong>Exercise 12:</strong> What will this print?</p>
+<pre class="r"><code>f2 &lt;- function( a, b, c ) { # here is another function
+  x &lt;- b
+  x &lt;- c
+  f3(a)
+}
+
+f3 &lt;- function( a) { } # with a silly helper function
+
+f2( print(1), print(2), print(3) ) # what will we print?</code></pre>
+<pre><code>## [1] 2
+## [1] 3</code></pre>
+<pre><code>## NULL</code></pre>
+<p>In R, arguments to a functions are not evaluated, they are packaged into <em>promises</em>. A promise is only evaluated if it is accessed (and only the first time it is accessed).</p>
+<p>Every expression is passed as a promise, except constants.</p>
+<p>The following is an obscure corner of R. Enjoy.</p>
+<pre class="r"><code>FU &lt;- function(b=&quot;&quot;) print(paste(&quot;FU&quot;,b))                # A function
+BAR &lt;- function( FU = print(&quot;BAR&quot;))  FU(&quot;bar&quot;)   # Another function with a default argument
+BAR()   # call bar will print ?</code></pre>
+<pre><code>## [1] &quot;BAR&quot;
+## [1] &quot;FU bar&quot;</code></pre>
+<pre class="r"><code>BAR( function(n) print(&quot;YO&quot;) )  # and now?</code></pre>
+<pre><code>## [1] &quot;YO&quot;</code></pre>
+</div>
+</div>
+<div id="building-abstractions" class="section level1">
+<h1>Building Abstractions</h1>
+<p>We have now reviewed the basic building blocks of the language. Using these building blocks it is possible to construct powerful abstractions.</p>
+<div id="building-a-factor-abstraction" class="section level2">
+<h2>Building a factor abstraction</h2>
+<p>First, lets look at how to implement factors using attributes.</p>
+<pre class="r"><code>simple_factor &lt;- function (x) {
+    levels &lt;- as.character(unique(x))
+    f &lt;- match(x, levels)
+    attr(f, &quot;levels&quot;) &lt;- levels
+    attr(f, &quot;class&quot;) &lt;- &quot;simple_factor&quot;
+    f
+}
+
+x &lt;- c(42, 42, 2, 3, 4)
+simple_factor(x)</code></pre>
+<pre><code>## [1] 1 1 2 3 4
+## attr(,&quot;levels&quot;)
+## [1] &quot;42&quot; &quot;2&quot;  &quot;3&quot;  &quot;4&quot; 
+## attr(,&quot;class&quot;)
+## [1] &quot;simple_factor&quot;</code></pre>
+<p>Printing is not very elegant. Let’s add a dedicated print function.</p>
+<pre class="r"><code>print.simple_factor &lt;-  function (x, ...)  {
+   xx &lt;- x  # copy x
+   class(xx) &lt;- NULL  # delete its class
+   levels(xx) &lt;- NULL # delete its levels
+   xx &lt;- sapply(xx, function(y) attr(x,&quot;levels&quot;)[y]) # replace levels with their values
+   print(xx, quote=FALSE)   # print without quotes
+   cat(paste(&quot;Levels: &quot;, paste(levels(x),collapse=&quot; &quot;)))  #print the levels
+  invisible(x)  # return x without echoing it
+}
+
+print(simple_factor(x))</code></pre>
+<pre><code>## [1] 42 42 2  3  4 
+## Levels:  42 2 3 4</code></pre>
+</div>
+<div id="building-a-counter-abstraction" class="section level2">
+<h2>Building a counter abstraction</h2>
+<p>With referential transparency it is difficult to mutate non-local state. What if we wanted to create a large number of counters and did not want anyone but us to be able to update them.</p>
+<pre class="r"><code>remove(xPriv)</code></pre>
+<pre><code>## Warning in remove(xPriv): object 'xPriv' not found</code></pre>
+<pre class="r"><code>counter &lt;- function() { xPriv &lt;- xPriv + 1; xPriv}
+#counter()             # oops, we need to define x
+xPriv&lt;-0
+counter()</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>counter()             # Hmm... not quite</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code># Super assignment to the rescue
+counter &lt;- function() { xPriv &lt;&lt;- xPriv + 1; xPriv}  # &lt;&lt;- assigns in the parent env
+counter()</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>counter()             # now we have a counter</code></pre>
+<pre><code>## [1] 2</code></pre>
+<p>This only lets us have a single counter. What if we want a counter factory?</p>
+<pre class="r"><code>mkC &lt;- function () { 
+    xPriv &lt;- 0
+    function() { xPriv &lt;&lt;- xPriv + 1; xPriv }
+  }
+
+count &lt;- mkC()
+count()</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>count()</code></pre>
+<pre><code>## [1] 2</code></pre>
+<p>The above uses the environment of the <code>mkC()</code> function to store the counter. Each time we call <code>mkC</code>, a new environment is created.</p>
+</div>
+<div id="building-abstractions-with-objects" class="section level2">
+<h2>Building abstractions with Objects</h2>
+<p>R has multiple object systems. They are constructed on top of attributes and reflective method invocation.</p>
+<p>The S3 system gives us single dispatch and simple structures.</p>
+<pre class="r"><code>x&lt;- 1
+attr(x, &quot;class&quot; ) &lt;- &quot;pen&quot;      # class is just an attribute like any other
+x</code></pre>
+<pre><code>## [1] 1
+## attr(,&quot;class&quot;)
+## [1] &quot;pen&quot;</code></pre>
+<pre class="r"><code>y&lt;- 1
+class(y ) &lt;- &quot;cowboy&quot;           # there is a dedicate function to set
+y</code></pre>
+<pre><code>## [1] 1
+## attr(,&quot;class&quot;)
+## [1] &quot;cowboy&quot;</code></pre>
+<pre class="r"><code>class(y) &lt;- c(&quot;cow?cboy&quot;,&quot;human&quot;) # one can be several things
+
+draw &lt;- function( this )  UseMethod(&quot;draw&quot;, this)  # this introduces the generic method
+draw.cowboy &lt;- function(this)  &quot;Bang&quot;      # different variants for different classes
+draw.pen &lt;- function(this) &quot;Scribble&quot;
+draw.default &lt;- function(this) &quot;Huh?&quot;     # default version when nothing else applies
+
+draw(x)</code></pre>
+<pre><code>## [1] &quot;Scribble&quot;</code></pre>
+<pre class="r"><code>draw(y)</code></pre>
+<pre><code>## [1] &quot;Huh?&quot;</code></pre>
+<pre class="r"><code>draw(1)</code></pre>
+<pre><code>## [1] &quot;Huh?&quot;</code></pre>
+<p>The S4 system is much richer.</p>
+<pre class="r"><code>setClass(&quot;Person&quot;,   # Create an new class with two slots
+      slots = list(name = &quot;character&quot;, age = &quot;numeric&quot;))
+
+setClass(&quot;Employee&quot;,  # Extends the Person class with another class
+      slots = list(boss = &quot;Person&quot;), 
+      contains = &quot;Person&quot;) # declare an inheritance relationship
+
+# create a few people
+alice &lt;- new(&quot;Person&quot;, name = &quot;Alice&quot;, age = 40)
+john &lt;- new(&quot;Employee&quot;, name = &quot;John&quot;, age = 20, boss = alice) # john's got a boss
+jack &lt;- new(&quot;Person&quot;, name = &quot;Jack&quot;, age = 42)
+
+alice@age              # ask an impolite question</code></pre>
+<pre><code>## [1] 40</code></pre>
+<pre class="r"><code>slot(john, &quot;boss&quot;)     # same</code></pre>
+<pre><code>## An object of class &quot;Person&quot;
+## Slot &quot;name&quot;:
+## [1] &quot;Alice&quot;
+## 
+## Slot &quot;age&quot;:
+## [1] 40</code></pre>
+<pre class="r"><code># Let's define methods
+setGeneric(&quot;hire&quot;,  function(x,y) standardGeneric(&quot;hire&quot;) )</code></pre>
+<pre><code>## [1] &quot;hire&quot;</code></pre>
+<pre class="r"><code># The first will work only for persons hiring employees
+setMethod(&quot;hire&quot;, 
+       c(x = &quot;Person&quot;, y = &quot;Employee&quot;), 
+       function(x, y) {
+         print(paste(x@name,&quot; hired &quot;,y@name)) 
+         return(setBoss(y)&lt;-x)  # change the boss slot
+       }
+)</code></pre>
+<pre><code>## [1] &quot;hire&quot;</code></pre>
+<pre class="r"><code># another method for setting fields
+setGeneric(&quot;setBoss&lt;-&quot;,function(object,value){standardGeneric(&quot;setBoss&lt;-&quot;)})</code></pre>
+<pre><code>## [1] &quot;setBoss&lt;-&quot;</code></pre>
+<pre class="r"><code>setReplaceMethod(f=&quot;setBoss&quot;,
+              signature=&quot;Employee&quot;,
+              definition=function(object,value) return(object@boss &lt;-value)
+              )</code></pre>
+<pre><code>## [1] &quot;setBoss&lt;-&quot;</code></pre>
+<pre class="r"><code>hire(alice, john)   # this should work</code></pre>
+<pre><code>## [1] &quot;Alice  hired  John&quot;</code></pre>
+<pre class="r"><code>print(hire(jack, john))  # and this too, changing the boss</code></pre>
+<pre><code>## [1] &quot;Jack  hired  John&quot;
+## An object of class &quot;Person&quot;
+## Slot &quot;name&quot;:
+## [1] &quot;Jack&quot;
+## 
+## Slot &quot;age&quot;:
+## [1] 42</code></pre>
+<pre class="r"><code>hire(john, john)  # this should work as an employee is person</code></pre>
+<pre><code>## [1] &quot;John  hired  John&quot;</code></pre>
+<pre class="r"><code>#hire(alice, alice) # this should fails as an employee isn't a person</code></pre>
+</div>
+<div id="build-abstraction-with-domain-specific-languages" class="section level2">
+<h2>Build abstraction with domain specific languages</h2>
+<p>R allows to leverage delayed evaluation in order to implement domain specific languages.</p>
+<p>Here is the example of timer function that repeatedly run the expression passed in as argument and reports the timing of that expression.</p>
+<pre class="r"><code>tm &lt;- function( exp ) {
+ x&lt;- deparse(substitute( exp ))   ## decompile the expression
+ t &lt;- 1                           ## repetion counter (we run exp 10 * t)
+ time = 0;                        ## reset timer
+ while ( time &lt; 1 ) {             ## continue looking until the code runs long enough
+  y &lt;- x                          ## code
+  for( i in 1:9 ) y &lt;- paste(y,&quot;;&quot;,x)  ## duplicate the code 10 times
+  y&lt;- paste(&quot; system.time ( for (i in 1:&quot;,t,&quot;) {&quot;, 
+            y,                    ## wrap the code with a loop that runs t times
+            &quot;}, gcFirst= FALSE)&quot;)
+  r &lt;- eval(parse(text=y))        ## execute
+  time &lt;- r[3]                    ## grab the elasped time
+  t &lt;- t * 10                     ## try with a bigger t
+ }
+ (time / (t * 10)) * 1000         ## return time in milliseconds (default is in s)
+}
+
+tm(1 + 1)</code></pre>
+<pre><code>##   elapsed 
+## 9.484e-06</code></pre>
 </div>
 </div>
 
