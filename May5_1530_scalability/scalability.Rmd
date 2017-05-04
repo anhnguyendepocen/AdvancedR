@@ -17,8 +17,6 @@ knitr::opts_chunk$set(message=FALSE, warning=FALSE)
 
 2. How to scale memory performance in R.
 
-3. Additional tools for high-performance computing in R.
-
 4. How to write C/C++ code for R.
 
 ## Scaling CPU performance in R
@@ -195,36 +193,215 @@ However, there are a growing number of packages dedicated to working with large 
     + Uses on-disk files for data storage
     + Supports custom data formats
 
-Although example `twin_dia` dataset is not very large, we will pretend that it is. If `twin_dia` were several GB (instead of several MB), how would we analyze it? Keep in mind that even if the data itself fits in memory, analyzing it will use additional memory overhead, so analysis may be impossible if the data is very large.
+#### Linear regression example
 
-#### Using bigmemory
+Suppose we want to run linear regression on a large dataset.
+
+```{r}
+n <- 1e6
+p <- 9
+
+b <- runif(p)
+names(b) <- paste0("x", 1:p)
+
+data <- vector("list", length=p + 1)
+
+data[[p + 1]] <- rnorm(n)
+
+for ( i in 1:p ) {
+  xi <- rnorm(n)
+  data[[i]] <- xi
+  data[[p + 1]] <- data[[p + 1]] + xi * b[i]
+}
+
+data <- as.data.frame(data)
+names(data) <- c(names(b), "y")
+
+library(pryr)
+object_size(data)
+```
+
+To save time later, we store the formula for `lm` now:
+
+```{r}
+fm <- as.formula(paste0("y ~ ", paste(names(b), collapse=" + ")))
+```
+
+To see how much memory is takes to run linear regression on this dataset, let's get our `mem_overhead` function from earlier.
+
+```{r, eval=FALSE}
+mem_max <- function() {
+  pryr:::show_bytes(sum(gc()[,5] * c(pryr:::node_size(), 8)))
+}
+
+mem_overhead <- function(code) {
+  gc(reset=TRUE)
+  expr <- substitute(code)
+  eval(expr, parent.frame())
+  rm(code, expr)
+  finish <- mem_used()
+  pryr:::show_bytes(mem_max() - finish)
+}
+```
+
+Now:
+
+```{r, eval=FALSE}
+mem_overhead(fit <- lm(fm, data=data))
+```
+
+We can see that using `lm` with a large dataset uses quite a lot of memory overhead.
+
+We could do bootstrapping in parallel:
+
+```{r, eval=FALSE}
+library(parallel)
+cl <- makePSOCKcluster(detectCores())
+seeds <- seq_len(1000)
+clusterExport(cl, c("data", "fm"))
+system.time(boot.out <- parLapply(cl, seeds, function(s) {
+  set.seed(s)
+  subdata <- data[sample(1000, replace=TRUE),]
+  coef(lm(fm, data=subdata))
+}))
+stopCluster(cl)
+```
+
+However, it takes significant overhead to export the data to each additional R session, especially if the data is very large. It would be great if the same dataset could be shared across R sessions.
+
+#### Using __bigmemory__
 
 ```{r}
 library(bigmemory)
 
-bm <- big.matrix(nrow=nrow(twin_dia3), 
-                            ncol=ncol(twin_dia3),
-                            dimnames=dimnames(twin_dia3))
-for ( nm in names(twin_dia3) )
-  bm[,nm] <- twin_dia3[[nm]]
+data.bm <- big.matrix(nrow=nrow(data), ncol=ncol(data),
+                   dimnames=list(NULL, colnames(data)))
 
-bm
-head(bm)
+for ( nm in names(data) )
+  data.bm[,nm] <- data[[nm]]
+
+data.bm
+head(data.bm)
 ```
 
-Note that __bigmemory__ does not support `factor` types, so these are converted to numeric types.
+This creates `big.matrix` in shared memory.
 
-If `twin_dia3` did not fit into memory, we would have to find another way to pull the data into R. __bigmemory__ provids a `read.big.matrix` for efficiently reading large ASCII files into a `big.matrix` object.
+Note that in this case, `object_size` would be inaccurate, since the matrix is fully loaded in memory, but it resides in shared memory not managed by R.
+
+Because `big.matrix` uses an external pointer to point to its data, it cannot be serialized across connections to other R sessions. Therefore, we use the `describe` and `attach.big.matrix` functions when using the dataset on our worker processes.
+
+```{r, eval=FALSE}
+cl <- makePSOCKcluster(detectCores())
+desc.bm <- describe(data.bm)
+clusterExport(cl, c("desc.bm", "fm"))
+system.time(boot.out <- parLapply(cl, seeds, function(s) {
+  set.seed(s)
+  require(bigmemory)
+  data.bm.remote <- attach.big.matrix(desc.bm)
+  subdata <- as.data.frame(data.bm.remote[sample(1000, replace=TRUE),])
+  coef(lm(fm, data=subdata))
+}))
+stopCluster(cl)
+```
+
+*Note: Ordinarily, this should work, but `attach.big.matrix` is currently broken for shared-memory matrices for me. Maybe you will have better luck.*
+
+A file-backed matrix can also be used.
 
 ```{r}
+tmpdir <- tempdir()
+tmpfile <- "tmp.bin"
+data.fbm <- filebacked.big.matrix(nrow=nrow(data), 
+                                  ncol=ncol(data),
+                   dimnames=list(NULL, colnames(data)),
+                   backingpath=tmpdir,
+                   backingfile=tmpfile,
+                   descriptorfile=paste0(tmpfile, ".desc"))
+
+for ( i in 1:ncol(data) )
+  data.fbm[,i] <- data.bm[,i]
+
+data.fbm
+head(data.fbm)
+object_size(data.fbm)
+```
+
+```{r, eval=FALSE}
 cl <- makePSOCKcluster(detectCores())
-desc <- describe(bm)
-clusterExport(cl, "desc")
-fit_dia$fit3 <- parLapply(cl, levels(twin_dia3$protein),  function(protein)
-{
-  bm.local <- attach.big.matrix(desc)
-  
-})
+desc.fbm <- describe(data.fbm)
+clusterExport(cl, c("desc.fbm", "tmpdir", "fm"))
+system.time(boot.out <- parLapply(cl, seeds, function(s) {
+  set.seed(s)
+  require(bigmemory)
+  data.fbm.remote <- attach.big.matrix(desc.fbm, path=tmpdir)
+  subdata <- as.data.frame(data.fbm.remote[sample(1000, replace=TRUE),])
+  coef(lm(fm, data=subdata))
+}))
+stopCluster(cl)
+```
+
+*Note: This one works for me.*
+
+#### Using __ff__
+
+With __ff__, we can take advantage of our `filebacked.big.matrix` and attach the same data with `ff`, which simply uses flat files for its data storage and access.
+
+```{r}
+library(ff)
+
+data.ff <- ff(vmode="double",
+              dim=dim(data.fbm),
+              dimnames=dimnames(data.fbm),
+              filename=paste0(tmpdir, "/", tmpfile))
+
+data.ff
+head(data.ff)
+object_size(data.ff)
+```
+
+Because __ff__ simply needs to know the filename and its other metadata (such as `dim` and `dimnames`) are stored in R, it can be serialized to other R sessions easily.
+
+```{r, eval=FALSE}
+cl <- makePSOCKcluster(detectCores())
+clusterExport(cl, c("data.ff", "fm"))
+system.time(boot.out <- parLapply(cl, seeds, function(s) {
+  set.seed(s)
+  require(ff)
+  subdata <- as.data.frame(data.ff[sample(1000, replace=TRUE),])
+  coef(lm(fm, data=subdata))
+}))
+stopCluster(cl)
+```
+
+#### Using __matter__
+
+Like __ff__, __matter__ can re-use the files we've already created, so we simply attach the existing backing file.
+
+A major advantage of __matter__ as opposed to __ff__ is that we could create a single matrix from multiple files, which is not possible with __ff__, and is only possible with __bigmemory__ with certain limitations (each column must be its own file).
+
+```{r}
+library(matter)
+
+data.mat <- matter(paths=filename(data.ff),
+                   nrow=nrow(data.ff), ncol=ncol(data.ff),
+                   dimnames=dimnames(data.ff))
+
+data.mat
+head(data.mat)
+object_size(data.mat)
+```
+
+__matter__ also stores its metadata in R, so `matter` objects can be serialized to other R sessions.
+
+```{r, eval=FALSE}
+cl <- makePSOCKcluster(detectCores())
+clusterExport(cl, c("data.mat", "fm"))
+system.time(boot.out <- parLapply(cl, seeds, function(s) {
+  set.seed(s)
+  require(matter)
+  subdata <- as.data.frame(data.mat[sample(1000, replace=TRUE),])
+  coef(lm(fm, data=subdata))
+}))
 stopCluster(cl)
 ```
 
