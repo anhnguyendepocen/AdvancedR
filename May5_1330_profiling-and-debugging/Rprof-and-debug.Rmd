@@ -232,17 +232,17 @@ For example:
 
 ```{r, eval=FALSE}
 x <- 1:10
-c(address(x), refs(x)) # refs = 1
+c(address(x), refs(x))
 x[1] <- 10
-c(address(x), refs(x)) # diff address, refs = 1 (copied)
+c(address(x), refs(x))
 y <- x
-c(address(x), refs(x)) # same address, refs = 2
-c(address(y), refs(y)) # same address, refs = 2
+c(address(x), refs(x))
+c(address(y), refs(y))
 y[1] <- 100
-c(address(x), refs(x)) # same address, refs = 2
-c(address(y), refs(y)) # diff address, refs = 1 (copied)
+c(address(x), refs(x))
+c(address(y), refs(y))
 x[1] <- 100
-c(address(x), refs(x)) # diff address, refs = 1 (copied)
+c(address(x), refs(x))
 ```
 
 *Note that `refs` will always return `2` in RStudio, because RStudio creates a reference to all objects in your global environment to make its environment browser work.*
@@ -254,23 +254,23 @@ When does `refs` get increased?
 ```{r, eval=FALSE}
 z <- 1:16
 z
-c(address(z), refs(z)) # refs = 1
+c(address(z), refs(z))
 names(z) <- letters[1:16]
 dim(z) <- c(4,4)
 dimnames(z) <- list(letters[1:4], letters[5:8])
 z
-c(address(z), refs(z)) # same address, refs = 1
+c(address(z), refs(z))
 ```
 
 Here, we've modified `z` many times, but its `refs` count has not increased, and its `address` hasn't changed. This is because `names`, `dim`, and `dimnames` are all primitive functions. Primitive functions do not increase the `refs` count. However, any other function that "touches" an object increases its `refs` count.
 
 ```{r, eval=FALSE}
 id <- function(x) x
-c(address(z), refs(z)) # refs = 1
+c(address(z), refs(z))
 id(z)
-c(address(z), refs(z)) # same address, refs = 2
+c(address(z), refs(z))
 dim(z) <- NULL
-c(address(z), refs(z)) # diff address, refs = 1
+c(address(z), refs(z))
 ```
 
 Here, `id()` is not a primitive function, so it increases the `refs` count, and modifying it (even with a primitive function like `dim`) now makes a copy of it.
